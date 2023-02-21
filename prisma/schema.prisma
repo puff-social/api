@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model feedback {
+  id      String  @id
+  message String
+  ip      String
+  user_id String?
+  users   users?  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model leaderboard {
+  id         String @id
+  total_dabs Int
+  user_id    String
+  users      users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model users {
+  id              String        @id
+  connection_id   String
+  platform        String
+  connection_name String
+  feedback        feedback[]
+  leaderboard     leaderboard[]
+}
