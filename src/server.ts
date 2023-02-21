@@ -12,6 +12,8 @@ server.register(cors, {
 
 server.register(Routes, { prefix: '/v1' });
 
+server.get('/health', (req, res) => res.status(204).send());
+
 server.setNotFoundHandler((req, res) => {
   res.status(404).send({ success: false, error: { code: 'route_not_found' } });
 });
