@@ -16,17 +16,18 @@ model feedback {
 }
 
 model leaderboard {
-  id         String @id
-  total_dabs Int
-  user_id    String
-  users      users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id              String   @id
+  device_id       String   @unique(map: "leaderboard_index")
+  device_birthday DateTime @db.Timestamp(6)
+  device_name     String
+  total_dabs      Int
+  owner_name      String
 }
 
 model users {
-  id              String        @id
+  id              String     @id
   connection_id   String
   platform        String
   connection_name String
   feedback        feedback[]
-  leaderboard     leaderboard[]
 }
