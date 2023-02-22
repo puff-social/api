@@ -17,21 +17,22 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
 
     const id = pika.gen('leaderboard');
     const deviceBirthday = new Date(Number(Buffer.from(validate.device.id, 'base64').toString('utf8')) * 1000);
+    const generatedDeviceId = `device_${Buffer.from(`${Buffer.from(validate.device.uid, 'base64').toString('utf8')}-${deviceBirthday.toISOString()}`).toString('base64')}`;
 
-    const existing = await prisma.leaderboard.findFirst({ where: { device_id: validate.device.id } });
+    const existing = await prisma.leaderboard.findFirst({ where: { device_id: generatedDeviceId } });
     if (existing) {
       await prisma.leaderboard.update({
         data: {
           device_name: validate.device.name, device_birthday: deviceBirthday, owner_name: validate.name, total_dabs: validate.device.totalDabs
         },
         where: {
-          device_id: validate.device.id
+          device_id: generatedDeviceId
         }
       });
     } else {
       await prisma.leaderboard.create({
         data: {
-          id, device_id: validate.device.id, device_name: validate.device.name, device_birthday: deviceBirthday, owner_name: validate.name, total_dabs: validate.device.totalDabs
+          id, device_id: generatedDeviceId, device_name: validate.device.name, device_birthday: deviceBirthday, owner_name: validate.name, total_dabs: validate.device.totalDabs
         }
       });
     }

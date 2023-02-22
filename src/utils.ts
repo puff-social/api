@@ -5,10 +5,11 @@ export const feedbackValidation = z.object({
 });
 
 export const trackingValidation = z.object({
+  name: z.string(),
   device: z.object({
     id: z.string(),
+    uid: z.string(),
     name: z.string(),
-    totalDabs: z.number(),
-  }),
-  name: z.string()
+    totalDabs: z.number()
+  })
 });
