@@ -16,14 +16,24 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
     const validate = await trackingValidation.parseAsync(req.body);
 
     const id = pika.gen('leaderboard');
-    const deviceBirthday = new Date(Number(Buffer.from(validate.device.id, 'base64').toString('utf8')) * 1000);
-    const generatedDeviceId = `device_${Buffer.from(`${Buffer.from(validate.device.uid, 'base64').toString('utf8')}-${deviceBirthday.toISOString()}`).toString('base64')}`;
+    const deviceId = Buffer.from(validate.device.id, 'base64').toString('utf8');
+    const deviceUid = Buffer.from(validate.device.uid, 'base64').toString('utf8');
+
+    if (isNaN(Number(deviceId)) || isNaN(Number(deviceUid)))
+      return res.status(400).send({ code: 'invalid_tracking_data' });
+
+    const deviceBirthday = new Date(Number(deviceId) * 1000);
+    const generatedDeviceId = `device_${Buffer.from(`${deviceUid}-${deviceBirthday.toISOString()}`).toString('base64')}`;
 
     const existing = await prisma.leaderboard.findFirst({ where: { device_id: generatedDeviceId } });
     if (existing) {
       await prisma.leaderboard.update({
         data: {
-          device_name: validate.device.name, device_birthday: deviceBirthday, owner_name: validate.name, total_dabs: validate.device.totalDabs
+          device_name: validate.device.name,
+          device_birthday: deviceBirthday,
+          owner_name: validate.name,
+          total_dabs: validate.device.totalDabs,
+          last_active: new Date().toISOString()
         },
         where: {
           device_id: generatedDeviceId
@@ -32,7 +42,12 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
     } else {
       await prisma.leaderboard.create({
         data: {
-          id, device_id: generatedDeviceId, device_name: validate.device.name, device_birthday: deviceBirthday, owner_name: validate.name, total_dabs: validate.device.totalDabs
+          id,
+          device_id: generatedDeviceId,
+          device_name: validate.device.name,
+          device_birthday: deviceBirthday,
+          owner_name: validate.name,
+          total_dabs: validate.device.totalDabs
         }
       });
     }
