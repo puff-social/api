@@ -33,6 +33,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
         data: {
           device_name: validate.device.name,
           device_birthday: deviceBirthday,
+          device_model: validate.device.deviceModel,
           owner_name: validate.name,
           total_dabs: validate.device.totalDabs,
           last_active: new Date().toISOString(),
@@ -49,6 +50,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
           device_id: generatedDeviceId,
           device_name: validate.device.name,
           device_birthday: deviceBirthday,
+          device_model: validate.device.deviceModel,
           owner_name: validate.name,
           total_dabs: validate.device.totalDabs,
           last_ip: ip,

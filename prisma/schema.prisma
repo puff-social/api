@@ -24,6 +24,7 @@ model leaderboard {
   owner_name      String
   last_active     DateTime @default(now()) @db.Timestamp(6)
   last_ip         String?
+  device_model    Int?     @db.SmallInt
 }
 
 model users {
