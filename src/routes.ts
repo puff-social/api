@@ -2,12 +2,13 @@ import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { ZodError } from "zod"
   ;
 import { pika } from "./pika";
-import { feedbackValidation, trackingValidation } from "./utils";
+import { feedbackValidation, sanitize, trackingValidation } from "./utils";
 import { prisma } from "./connectivity/prsima";
 
 export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next: () => void) {
   server.get('/leaderboard', async (req, res) => {
     const leaderboards = await prisma.leaderboard.findMany({ orderBy: { total_dabs: 'desc' }, take: 10 });
+    for (const lb of leaderboards) sanitize(lb, ['last_ip']);
 
     return res.status(200).send({ success: true, data: { leaderboards } });
   });
@@ -16,6 +17,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
     const validate = await trackingValidation.parseAsync(req.body);
 
     const id = pika.gen('leaderboard');
+    const ip = (req.headers['cf-connecting-ip'] || req.connection.remoteAddress || '0.0.0.0') as string;
     const deviceId = Buffer.from(validate.device.id, 'base64').toString('utf8');
     const deviceUid = Buffer.from(validate.device.uid, 'base64').toString('utf8');
 
@@ -33,7 +35,8 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
           device_birthday: deviceBirthday,
           owner_name: validate.name,
           total_dabs: validate.device.totalDabs,
-          last_active: new Date().toISOString()
+          last_active: new Date().toISOString(),
+          last_ip: ip,
         },
         where: {
           device_id: generatedDeviceId
@@ -47,7 +50,8 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
           device_name: validate.device.name,
           device_birthday: deviceBirthday,
           owner_name: validate.name,
-          total_dabs: validate.device.totalDabs
+          total_dabs: validate.device.totalDabs,
+          last_ip: ip,
         }
       });
     }

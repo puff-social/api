@@ -23,6 +23,7 @@ model leaderboard {
   total_dabs      Int
   owner_name      String
   last_active     DateTime @default(now()) @db.Timestamp(6)
+  last_ip         String?
 }
 
 model users {
