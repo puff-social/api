@@ -6,6 +6,12 @@ import { Routes } from './routes';
 
 const server = fastify();
 
+server.register(import('fastify-raw-body'), {
+  field: 'rawBody',
+  encoding: 'base64',
+  runFirst: true,
+});
+
 server.register(cors, {
   origin: true
 });

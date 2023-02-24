@@ -34,3 +34,12 @@ model users {
   connection_name String
   feedback        feedback[]
 }
+
+model diagnostics {
+  id              String @id
+  device_name     String
+  device_firmware Int    @db.SmallInt
+  device_model    Int    @db.SmallInt
+  user_agent      String
+  ip              String
+}

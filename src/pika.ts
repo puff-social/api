@@ -1,3 +1,3 @@
 import { Pika } from "pika-id";
 
-export const pika = new Pika(['feedback', 'leaderboard'], { epoch: 1676953708489 });
+export const pika = new Pika(['feedback', 'leaderboard', 'diagnostics'], { epoch: 1676953708489 });

@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { ZodError } from "zod"
   ;
 import { pika } from "./pika";
-import { feedbackValidation, sanitize, trackingValidation } from "./utils";
+import { diagValidation, feedbackValidation, sanitize, trackingValidation, verifyRequest } from "./utils";
 import { prisma } from "./connectivity/prsima";
 
 export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next: () => void) {
@@ -14,7 +14,9 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
   });
 
   server.post('/track', async (req, res) => {
-    const validate = await trackingValidation.parseAsync(req.body);
+    if (!req.headers['x-signature']) return res.status(400).send({ code: 'invalid_tracking_data' });
+    const body = await verifyRequest(Buffer.from(req.rawBody as string, 'base64'), req.headers['x-signature'] as string);
+    const validate = await trackingValidation.parseAsync(body);
 
     const id = pika.gen('leaderboard');
     const ip = (req.headers['cf-connecting-ip'] || req.connection.remoteAddress || '0.0.0.0') as string;
@@ -61,9 +63,34 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
     return res.status(204).send();
   });
 
+  server.post('/diag', async (req, res) => {
+    if (!req.headers['x-signature']) return res.status(400).send({ code: 'invalid_diag_data' });
+    const body = await verifyRequest(Buffer.from(req.rawBody as string, 'base64'), req.headers['x-signature'] as string);
+    const validate = await diagValidation.parseAsync(body);
+
+    const id = pika.gen('diagnostics');
+    const ip = (req.headers['cf-connecting-ip'] || req.connection.remoteAddress || '0.0.0.0') as string;
+    const userAgent = req.headers["user-agent"];
+
+    await prisma.diagnostics.create({
+      data: {
+        id,
+        device_name: validate.device_name,
+        device_model: validate.device_model,
+        device_firmware: validate.device_firmware,
+        user_agent: userAgent || 'unknown',
+        ip,
+      }
+    });
+
+    return res.status(204).send();
+  });
+
   server.post('/feedback', async (req, res) => {
     try {
-      const validate = await feedbackValidation.parseAsync(req.body);
+      if (!req.headers['x-signature']) return res.status(400).send({ code: 'invalid_feedback_request' });
+      const body = await verifyRequest(Buffer.from(req.rawBody as string, 'base64'), req.headers['x-signature'] as string);
+      const validate = await feedbackValidation.parseAsync(body);
 
       const id = pika.gen('feedback');
       const ip = (req.headers['cf-connecting-ip'] || req.connection.remoteAddress || '0.0.0.0') as string;
