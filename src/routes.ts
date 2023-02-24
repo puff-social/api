@@ -32,7 +32,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
       await prisma.leaderboard.update({
         data: {
           device_name: validate.device.name,
-          device_birthday: deviceBirthday,
+          device_dob: deviceBirthday,
           device_model: validate.device.model,
           owner_name: validate.name,
           total_dabs: validate.device.totalDabs,
@@ -49,7 +49,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
           id,
           device_id: generatedDeviceId,
           device_name: validate.device.name,
-          device_birthday: deviceBirthday,
+          device_dob: deviceBirthday,
           device_model: validate.device.model,
           owner_name: validate.name,
           total_dabs: validate.device.totalDabs,
