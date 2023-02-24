@@ -11,7 +11,7 @@ export const trackingValidation = z.object({
     uid: z.string(),
     name: z.string(),
     totalDabs: z.number(),
-    deviceModel: z.number().min(48).max(51),
+    model: z.number().min(48).max(51),
   })
 });
 
