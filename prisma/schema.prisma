@@ -16,15 +16,15 @@ model feedback {
 }
 
 model leaderboard {
-  id              String   @id
-  device_id       String   @unique(map: "leaderboard_index")
-  device_birthday DateTime @db.Timestamp(6)
-  device_name     String
-  total_dabs      Int
-  owner_name      String
-  last_active     DateTime @default(now()) @db.Timestamp(6)
-  last_ip         String?
-  device_model    Int?     @db.SmallInt
+  id           String   @id
+  device_id    String   @unique(map: "leaderboard_index")
+  device_dob   DateTime @db.Timestamp(6)
+  device_name  String
+  total_dabs   Int
+  owner_name   String
+  last_active  DateTime @default(now()) @db.Timestamp(6)
+  last_ip      String?
+  device_model Int?     @db.SmallInt
 }
 
 model users {
