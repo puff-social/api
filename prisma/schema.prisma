@@ -8,11 +8,9 @@ datasource db {
 }
 
 model feedback {
-  id      String  @id
+  id      String @id
   message String
   ip      String
-  user_id String?
-  users   users?  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model leaderboard {
@@ -25,14 +23,6 @@ model leaderboard {
   last_active  DateTime @default(now()) @db.Timestamp(6)
   last_ip      String?
   device_model Int?     @db.SmallInt
-}
-
-model users {
-  id              String     @id
-  connection_id   String
-  platform        String
-  connection_name String
-  feedback        feedback[]
 }
 
 model diagnostics {
