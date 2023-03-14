@@ -13,12 +13,12 @@ export const trackingValidation = z.object({
     uid: z.string(),
     name: z.string(),
     totalDabs: z.number(),
-    model: z.number().min(48).max(64),
+    model: z.string(),
   })
 });
 
 export const diagValidation = z.object({
-  device_model: z.number(),
+  device_model: z.string(),
   device_firmware: z.string(),
   device_name: z.string(),
 });

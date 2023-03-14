@@ -22,14 +22,14 @@ model leaderboard {
   owner_name   String
   last_active  DateTime @default(now()) @db.Timestamp(6)
   last_ip      String?
-  device_model Int?     @db.SmallInt
+  device_model String?
 }
 
 model diagnostics {
   id              String @id
   device_name     String
   device_firmware String
-  device_model    Int    @db.SmallInt
+  device_model    String
   user_agent      String
   ip              String
 }
