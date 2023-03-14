@@ -19,7 +19,7 @@ export const trackingValidation = z.object({
 
 export const diagValidation = z.object({
   device_model: z.number(),
-  device_firmware: z.number(),
+  device_firmware: z.string(),
   device_name: z.string(),
 });
 

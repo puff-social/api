@@ -28,8 +28,29 @@ model leaderboard {
 model diagnostics {
   id              String @id
   device_name     String
-  device_firmware Int    @db.SmallInt
+  device_firmware String
   device_model    Int    @db.SmallInt
   user_agent      String
   ip              String
+}
+
+model devices {
+  id              String   @id
+  owner_id        String?
+  device_eid      String
+  device_dob      DateTime @db.Timestamp(6)
+  device_name     String
+  device_model    Int      @db.SmallInt
+  device_firmware Int      @db.SmallInt
+  last_active     DateTime @default(now()) @db.Timestamp(6)
+  last_ip         String?
+  users           users?   @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  id            String    @id
+  name          String
+  platform      String    @default("discord")
+  connection_id String
+  devices       devices[]
 }
