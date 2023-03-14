@@ -20,6 +20,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
 
     const id = pika.gen('leaderboard');
     const ip = (req.headers['cf-connecting-ip'] || req.connection.remoteAddress || '0.0.0.0') as string;
+    console.log(`New track request from ${ip}`, body);
     const deviceId = Buffer.from(validate.device.id, 'base64').toString('utf8');
     const deviceUid = Buffer.from(validate.device.uid, 'base64').toString('utf8');
 
