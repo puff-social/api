@@ -19,7 +19,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
     const validate = await trackingValidation.parseAsync(body);
 
     const id = pika.gen('leaderboard');
-    const ip = (req.headers['cf-connecting-ip'] || req.connection.remoteAddress || '0.0.0.0') as string;
+    const ip = (req.headers['cf-connecting-ip'] || req.socket.remoteAddress || '0.0.0.0') as string;
     const deviceId = Buffer.from(validate.device.id, 'base64').toString('utf8');
     const deviceUid = Buffer.from(validate.device.uid, 'base64').toString('utf8');
 
@@ -69,19 +69,48 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
     const validate = await diagValidation.parseAsync(body);
 
     const id = pika.gen('diagnostics');
-    const ip = (req.headers['cf-connecting-ip'] || req.connection.remoteAddress || '0.0.0.0') as string;
+    const ip = (req.headers['cf-connecting-ip'] || req.socket.remoteAddress || '0.0.0.0') as string;
     const userAgent = req.headers["user-agent"];
 
-    await prisma.diagnostics.create({
-      data: {
-        id,
-        device_name: validate.device_name,
-        device_model: validate.device_model,
-        device_firmware: validate.device_firmware,
-        user_agent: userAgent || 'unknown',
-        ip,
-      }
+    console.log('diag', {
+      id,
+      device_name: validate.device_parameters.name,
+      device_model: validate.device_parameters.model,
+      device_firmware: validate.device_parameters.firmware,
+      authenticated: validate.device_parameters.authenticated,
+      pup: validate.device_parameters.pupService,
+      lorax: validate.device_parameters.loraxService,
+      device_uid: validate.device_parameters.uid,
+      device_dob: validate.device_parameters.dob && validate.device_parameters.dob != 1000 ? new Date(validate.device_parameters.dob as number * 1000) : null,
+      device_chamber_type: validate.device_parameters.chamberType,
+      device_profiles: validate.device_profiles,
+      device_services: validate.device_services,
+      user_agent: userAgent || 'unknown',
+      ip,
     });
+
+    try {
+      await prisma.diag.create({
+        data: {
+          id,
+          device_name: validate.device_parameters.name,
+          device_model: validate.device_parameters.model,
+          device_firmware: validate.device_parameters.firmware,
+          authenticated: validate.device_parameters.authenticated,
+          pup: validate.device_parameters.pupService,
+          lorax: validate.device_parameters.loraxService,
+          device_uid: validate.device_parameters.uid,
+          device_dob: validate.device_parameters.dob != 1000 ? new Date(validate.device_parameters.dob as number * 1000) : null,
+          device_chamber_type: validate.device_parameters.chamberType,
+          device_profiles: validate.device_profiles,
+          device_services: validate.device_services,
+          user_agent: userAgent || 'unknown',
+          ip,
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
 
     return res.status(204).send();
   });
@@ -93,7 +122,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
       const validate = await feedbackValidation.parseAsync(body);
 
       const id = pika.gen('feedback');
-      const ip = (req.headers['cf-connecting-ip'] || req.connection.remoteAddress || '0.0.0.0') as string;
+      const ip = (req.headers['cf-connecting-ip'] || req.socket.remoteAddress || '0.0.0.0') as string;
 
       await prisma.feedback.create({
         data: {

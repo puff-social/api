@@ -1,5 +1,5 @@
 import { createDecipheriv, createHash } from "crypto";
-import { z } from "zod";
+import { number, z } from "zod";
 import { env } from "./env";
 
 export const feedbackValidation = z.object({
@@ -17,10 +17,22 @@ export const trackingValidation = z.object({
   })
 });
 
+const profileValidation = z.object({ name: z.string(), temp: z.number(), time: z.string() });
+
 export const diagValidation = z.object({
-  device_model: z.string(),
-  device_firmware: z.string(),
-  device_name: z.string(),
+  device_services: z.array(z.object({ uuid: z.string(), characteristicCount: z.number() })),
+  device_profiles: z.object({ 1: profileValidation, 2: profileValidation, 3: profileValidation, 4: profileValidation }).optional(),
+  device_parameters: z.object({
+    name: z.string(),
+    model: z.number(),
+    firmware: z.string(),
+    uid: z.string().optional(),
+    dob: z.number().optional(),
+    chamberType: z.number().optional(),
+    authenticated: z.boolean().optional(),
+    pupService: z.boolean().optional(),
+    loraxService: z.boolean().optional()
+  })
 });
 
 export function verifyRequest<T>(body: Buffer, signature: string): T {

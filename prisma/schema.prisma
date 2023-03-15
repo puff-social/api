@@ -54,3 +54,20 @@ model users {
   connection_id String
   devices       devices[]
 }
+
+model diag {
+  id                  String    @id
+  device_name         String
+  device_firmware     String
+  device_model        Int
+  device_uid          String?
+  device_chamber_type Int?      @db.SmallInt
+  device_dob          DateTime? @db.Timestamp(6)
+  device_profiles     Json?
+  device_services     Json[]
+  lorax               Boolean   @default(false)
+  pup                 Boolean   @default(false)
+  authenticated       Boolean   @default(false)
+  user_agent          String
+  ip                  String
+}
