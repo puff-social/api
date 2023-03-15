@@ -27,7 +27,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
       return res.status(400).send({ code: 'invalid_tracking_data' });
 
     const deviceBirthday = new Date(Number(deviceId) * 1000);
-    const generatedDeviceId = `device_${Buffer.from(`${deviceUid}`).toString('base64')}`;
+    const generatedDeviceId = `device_${Buffer.from(deviceUid).toString('base64')}`;
 
     const existing = await prisma.leaderboard.findFirst({ where: { device_id: generatedDeviceId } });
     if (existing) {
