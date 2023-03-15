@@ -20,6 +20,7 @@ export const trackingValidation = z.object({
 const profileValidation = z.object({ name: z.string(), temp: z.number(), time: z.string() });
 
 export const diagValidation = z.object({
+  session_id: z.string(),
   device_services: z.array(z.object({ uuid: z.string(), characteristicCount: z.number() })),
   device_profiles: z.object({ 1: profileValidation, 2: profileValidation, 3: profileValidation, 4: profileValidation }).optional(),
   device_parameters: z.object({

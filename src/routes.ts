@@ -91,6 +91,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
           device_chamber_type: validate.device_parameters.chamberType,
           device_profiles: validate.device_profiles,
           device_services: validate.device_services,
+          session_id: validate.session_id,
           user_agent: userAgent || 'unknown',
           ip,
         }

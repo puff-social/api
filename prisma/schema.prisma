@@ -74,4 +74,5 @@ model diag {
   authenticated           Boolean   @default(false)
   user_agent              String
   ip                      String
+  session_id              String?
 }
