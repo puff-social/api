@@ -72,23 +72,6 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
     const ip = (req.headers['cf-connecting-ip'] || req.socket.remoteAddress || '0.0.0.0') as string;
     const userAgent = req.headers["user-agent"];
 
-    console.log('diag', {
-      id,
-      device_name: validate.device_parameters.name,
-      device_model: validate.device_parameters.model,
-      device_firmware: validate.device_parameters.firmware,
-      authenticated: validate.device_parameters.authenticated,
-      pup: validate.device_parameters.pupService,
-      lorax: validate.device_parameters.loraxService,
-      device_uid: validate.device_parameters.uid,
-      device_dob: validate.device_parameters.dob && validate.device_parameters.dob != 1000 ? new Date(validate.device_parameters.dob as number * 1000) : null,
-      device_chamber_type: validate.device_parameters.chamberType,
-      device_profiles: validate.device_profiles,
-      device_services: validate.device_services,
-      user_agent: userAgent || 'unknown',
-      ip,
-    });
-
     try {
       await prisma.diag.create({
         data: {
