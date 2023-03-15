@@ -24,7 +24,7 @@ export const diagValidation = z.object({
   device_profiles: z.object({ 1: profileValidation, 2: profileValidation, 3: profileValidation, 4: profileValidation }).optional(),
   device_parameters: z.object({
     name: z.string(),
-    model: z.number(),
+    model: z.string(),
     firmware: z.string(),
     hash: z.string().optional(),
     uptime: z.number().optional(),

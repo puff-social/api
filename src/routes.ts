@@ -122,7 +122,6 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
       if (error instanceof ZodError)
         return res.status(400).send({ success: false, error: { code: 'validation_error', issues: error.issues } });
 
-
       console.error('error with feedback', error);
       return res.status(500).send({ success: false, error: { code: 'internal_error' } });
     }
