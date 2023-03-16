@@ -26,7 +26,6 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
     if (isNaN(Number(deviceId)) || isNaN(Number(deviceUid)))
       return res.status(400).send({ code: 'invalid_tracking_data' });
 
-    const deviceBirthday = new Date(Number(deviceId) * 1000);
     const generatedDeviceId = `device_${Buffer.from(deviceUid).toString('base64')}`;
 
     const existing = await prisma.leaderboard.findFirst({ where: { device_id: generatedDeviceId } });
@@ -34,7 +33,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
       await prisma.leaderboard.update({
         data: {
           device_name: validate.device.name,
-          device_dob: deviceBirthday,
+          device_dob: new Date(validate.device.dob * 1000),
           device_model: validate.device.model,
           owner_name: validate.name,
           total_dabs: validate.device.totalDabs,
@@ -51,7 +50,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
           id,
           device_id: generatedDeviceId,
           device_name: validate.device.name,
-          device_dob: deviceBirthday,
+          device_dob: new Date(validate.device.dob * 1000),
           device_model: validate.device.model,
           owner_name: validate.name,
           total_dabs: validate.device.totalDabs,
