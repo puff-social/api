@@ -9,7 +9,6 @@ export const feedbackValidation = z.object({
 export const trackingValidation = z.object({
   name: z.string(),
   device: z.object({
-    id: z.string(),
     dob: z.number(),
     uid: z.string(),
     name: z.string(),
