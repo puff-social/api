@@ -20,10 +20,9 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
 
     const id = pika.gen('leaderboard');
     const ip = (req.headers['cf-connecting-ip'] || req.socket.remoteAddress || '0.0.0.0') as string;
-    const deviceId = Buffer.from(validate.device.id, 'base64').toString('utf8');
     const deviceUid = Buffer.from(validate.device.uid, 'base64').toString('utf8');
 
-    if (isNaN(Number(deviceId)) || isNaN(Number(deviceUid)))
+    if (isNaN(Number(deviceUid)))
       return res.status(400).send({ code: 'invalid_tracking_data' });
 
     const generatedDeviceId = `device_${Buffer.from(deviceUid).toString('base64')}`;
