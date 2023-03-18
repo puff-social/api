@@ -2,6 +2,16 @@ import { createDecipheriv, createHash } from "crypto";
 import { number, z } from "zod";
 import { env } from "./env";
 
+export const ProductModelMap = [
+  '0',
+  '21', // Why another one
+  '4294967295', // wtf is this puffco
+  '1',
+  '22', // Again why another, what happened here?
+  '2',
+  '4',
+] as const;
+
 export const feedbackValidation = z.object({
   message: z.string().max(1024)
 });
@@ -13,7 +23,7 @@ export const trackingValidation = z.object({
     uid: z.string(),
     name: z.string(),
     totalDabs: z.number(),
-    model: z.string(),
+    model: z.enum(ProductModelMap),
   })
 });
 
@@ -25,7 +35,7 @@ export const diagValidation = z.object({
   device_profiles: z.object({ 1: profileValidation, 2: profileValidation, 3: profileValidation, 4: profileValidation }).optional(),
   device_parameters: z.object({
     name: z.string(),
-    model: z.string(),
+    model: z.enum(ProductModelMap),
     firmware: z.string(),
     hash: z.string().optional(),
     uptime: z.number().optional(),
