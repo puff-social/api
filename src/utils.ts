@@ -21,7 +21,7 @@ export const trackingValidation = z.object({
   device: z.object({
     dob: z.number(),
     uid: z.string(),
-    name: z.string(),
+    name: z.string().max(32),
     totalDabs: z.number(),
     model: z.enum(ProductModelMap),
   })
@@ -37,7 +37,7 @@ export const diagValidation = z.object({
     name: z.string(),
     model: z.enum(ProductModelMap),
     firmware: z.string(),
-    hash: z.string().optional(),
+    hash: z.string().max(7).optional(),
     uptime: z.number().optional(),
     utc: z.number().optional(),
     batteryCapacity: z.number().optional(),
