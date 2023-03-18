@@ -17,10 +17,10 @@ export const feedbackValidation = z.object({
 });
 
 export const trackingValidation = z.object({
-  name: z.string(),
+  name: z.string().max(32),
   device: z.object({
     dob: z.number(),
-    uid: z.string(),
+    uid: z.string().max(32),
     name: z.string().max(32),
     totalDabs: z.number(),
     model: z.enum(ProductModelMap),
