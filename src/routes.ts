@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
 import { ZodError } from "zod"
   ;
 import { pika } from "./pika";
@@ -61,7 +61,15 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
       });
     }
 
-    return res.status(204).send();
+    const leaderboard = await prisma.leaderboard.findMany({ orderBy: { total_dabs: 'desc' } });
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        device: leaderboard.find(d => d.device_id == generatedDeviceId),
+        position: leaderboard.findIndex(d => d.device_id == generatedDeviceId) + 1
+      }
+    });
   });
 
   server.post('/diag', async (req, res) => {
@@ -128,6 +136,25 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
       return res.status(500).send({ success: false, error: { code: 'internal_error' } });
     }
 
+  });
+
+  server.get('/device/:device_id', async (req: FastifyRequest<{ Params: { device_id: string } }>, res) => {
+    try {
+      const leaderboard = await prisma.leaderboard.findMany({ orderBy: { total_dabs: 'desc' } });
+      const device = leaderboard.find((d) => d.device_id == req.params.device_id);
+      if (!device) return res.status(404).send({ success: false, error: { code: 'device_not_found' } });
+
+      return res.status(200).send({
+        success: true,
+        data: {
+          device: sanitize(device, ['last_ip']),
+          position: leaderboard.findIndex((d) => d.id == device.id) + 1
+        }
+      });
+    } catch (error) {
+      console.error('error with get device', error);
+      return res.status(500).send({ success: false, error: { code: 'internal_error' } });
+    }
   });
 
   return next();
