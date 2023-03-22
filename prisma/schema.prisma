@@ -26,15 +26,6 @@ model leaderboard {
   leaderboard_positions leaderboard_positions?
 }
 
-model diagnostics {
-  id              String @id
-  device_name     String
-  device_firmware String
-  device_model    String
-  user_agent      String
-  ip              String
-}
-
 model devices {
   id              String   @id
   owner_id        String?
@@ -56,7 +47,7 @@ model users {
   devices       devices[]
 }
 
-model diag {
+model diagnostics {
   id                      String    @id
   device_name             String
   device_firmware         String

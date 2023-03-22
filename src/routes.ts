@@ -82,7 +82,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
     const userAgent = req.headers["user-agent"];
 
     try {
-      await prisma.diag.create({
+      await prisma.diagnostics.create({
         data: {
           id,
           device_name: validate.device_parameters.name,
