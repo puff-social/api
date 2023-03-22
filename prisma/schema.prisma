@@ -14,15 +14,16 @@ model feedback {
 }
 
 model leaderboard {
-  id           String   @id
-  device_id    String   @unique(map: "leaderboard_index")
-  device_dob   DateTime @db.Timestamp(6)
-  device_name  String
-  total_dabs   Int
-  owner_name   String
-  last_active  DateTime @default(now()) @db.Timestamp(6)
-  last_ip      String?
-  device_model String?
+  id                    String                 @id
+  device_id             String                 @unique(map: "leaderboard_index")
+  device_dob            DateTime               @db.Timestamp(6)
+  device_name           String
+  total_dabs            Int
+  owner_name            String
+  last_active           DateTime               @default(now()) @db.Timestamp(6)
+  last_ip               String?
+  device_model          String?
+  leaderboard_positions leaderboard_positions?
 }
 
 model diagnostics {
@@ -75,4 +76,10 @@ model diag {
   user_agent              String
   ip                      String
   session_id              String?
+}
+
+model leaderboard_positions {
+  device_id   String      @id
+  position    Int
+  leaderboard leaderboard @relation(fields: [device_id], references: [device_id], onDelete: Cascade)
 }

@@ -140,15 +140,15 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
 
   server.get('/device/:device_id', async (req: FastifyRequest<{ Params: { device_id: string } }>, res) => {
     try {
-      const leaderboard = await prisma.leaderboard.findMany({ orderBy: { total_dabs: 'desc' } });
-      const device = leaderboard.find((d) => d.device_id == req.params.device_id);
+      const device = await prisma.leaderboard.findFirst({ where: { device_id: req.params.device_id } });
       if (!device) return res.status(404).send({ success: false, error: { code: 'device_not_found' } });
+      const position = await prisma.leaderboard_positions.findFirst({ where: { device_id: device.device_id } });
 
       return res.status(200).send({
         success: true,
         data: {
           device: sanitize(device, ['last_ip']),
-          position: leaderboard.findIndex((d) => d.id == device.id) + 1
+          position: position?.position
         }
       });
     } catch (error) {
