@@ -1,3 +1,15 @@
 import { Pika } from "pika-id";
 
-export const pika = new Pika(['feedback', 'leaderboard', 'diagnostics'], { epoch: 1676953708489 });
+const prefixes = [
+  'feedback', 'leaderboard', 'diagnostics', 'strain', 'user',
+  {
+    prefix: 'oauth',
+    secure: true
+  },
+  {
+    prefix: 'session',
+    secure: true
+  }
+];
+
+export const pika = new Pika(prefixes, { epoch: 1676953708489 });

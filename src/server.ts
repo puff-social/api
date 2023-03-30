@@ -2,7 +2,9 @@ import fastify from 'fastify';
 import cors from '@fastify/cors';
 
 import { env } from './env';
-import { Routes } from './routes';
+import { AuthedRoutes, Routes } from './routes';
+
+import './internal';
 
 const server = fastify();
 
@@ -17,6 +19,7 @@ server.register(cors, {
 });
 
 server.register(Routes, { prefix: '/v1' });
+server.register(AuthedRoutes, { prefix: '/v1' });
 
 server.get('/health', (req, res) => res.status(204).send());
 

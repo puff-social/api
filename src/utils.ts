@@ -1,16 +1,8 @@
+import { z } from "zod";
 import { createDecipheriv, createHash } from "crypto";
-import { number, z } from "zod";
-import { env } from "./env";
 
-export const ProductModelMap = [
-  '0',
-  '21', // Why another one
-  '4294967295', // wtf is this puffco
-  '1',
-  '22', // Again why another, what happened here?
-  '2',
-  '4',
-] as const;
+import { env } from "./env";
+import { ProductModelMap } from "./constants";
 
 export const feedbackValidation = z.object({
   message: z.string().max(1024)
