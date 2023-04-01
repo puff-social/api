@@ -43,7 +43,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
   server.register(AuthMiddleware);
 
   server.get('/leaderboard', async (req, res) => {
-    const leaderboards = await prisma.leaderboard.findMany({ orderBy: { total_dabs: 'desc' }, take: 10 });
+    const leaderboards = await prisma.leaderboard.findMany({ orderBy: { total_dabs: 'desc' }, take: 10, include: { users: { select: { name: true, image: true, flags: true, platform: true, platform_id: true } } } });
     for (const lb of leaderboards) sanitize(lb, ['last_ip']);
 
     return res.status(200).send({ success: true, data: { leaderboards } });
@@ -77,6 +77,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
           total_dabs: validate.device.totalDabs,
           last_active: new Date().toISOString(),
           last_ip: ip,
+          ...(req.user ? { user_id: req.user.id } : {})
         },
         where: {
           device_id: generatedDeviceId
@@ -93,6 +94,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
           owner_name: validate.name,
           total_dabs: validate.device.totalDabs,
           last_ip: ip,
+          ...(req.user ? { user_id: req.user.id } : {})
         }
       });
     }
@@ -176,7 +178,7 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
 
   server.get('/device/:device_id', async (req: FastifyRequest<{ Params: { device_id: string } }>, res) => {
     try {
-      const device = await prisma.leaderboard.findFirst({ where: { device_id: req.params.device_id } });
+      const device = await prisma.leaderboard.findFirst({ where: { device_id: req.params.device_id }, include: { users: { select: { name: true, image: true, flags: true, platform: true, platform_id: true } } } });
       if (!device) return res.status(404).send({ success: false, error: { code: 'device_not_found' } });
       const position = await prisma.leaderboard_positions.findFirst({ where: { device_id: device.device_id } });
 
