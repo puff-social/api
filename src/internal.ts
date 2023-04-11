@@ -14,5 +14,5 @@ server.setNotFoundHandler((req, res) => {
 });
 
 server.listen({ port: env.INT_PORT, host: '0.0.0.0' }, () => {
-  console.log(`Analytics > Internal API listening on ${env.INT_PORT}`);
+  console.log(`API > Internal API listening on ${env.INT_PORT}`);
 });

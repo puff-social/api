@@ -1,7 +1,7 @@
 import { ZodError } from "zod";
 import { createHash } from "crypto";
 import { stringify } from "querystring";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
 
 import { env } from "./env";
@@ -227,6 +227,31 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
         if (existingUser) {
           const session = pika.gen('session');
           await keydb.set(`sessions/${session}`, existingUser.id);
+
+          console.log(user.avatar, existingUser.image);
+          if (user.avatar != existingUser.image) {
+            if (existingUser.image) await minio.send(new DeleteObjectCommand({
+              Bucket: env.MINIO_BUCKET,
+              Key: `avatars/${existingUser.id}/${existingUser.image}.${existingUser.image.startsWith('a_') ? 'gif' : 'png'}`,
+            }));
+
+            const img = await fetch(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${user.avatar.startsWith('a_') ? 'gif' : 'png'}?size=512`).then(r => r.arrayBuffer());
+            const imgBuffer = Buffer.from(img);
+            const hash = user.avatar;
+            await minio.send(
+              new PutObjectCommand({
+                Bucket: env.MINIO_BUCKET,
+                Key: `avatars/${existingUser.id}/${hash}.${hash.startsWith('a_') ? 'gif' : 'png'}`,
+                Body: imgBuffer,
+                ContentType: "image/png",
+              })
+            );
+
+            await prisma.users.update({ where: { id: existingUser.id }, data: { image: hash } });
+
+            existingUser.image = hash;
+          }
+
           return res.status(200).send({ success: true, data: { user: sanitize(existingUser, ['platform', 'platform_id', 'refresh_token']), token: session } });
         }
 
@@ -234,11 +259,11 @@ export function Routes(server: FastifyInstance, opts: FastifyPluginOptions, next
 
         const img = await fetch(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${user.avatar.startsWith('a_') ? 'gif' : 'png'}?size=512`).then(r => r.arrayBuffer());
         const imgBuffer = Buffer.from(img);
-        const hash = createHash('sha1').update(imgBuffer).digest('hex');
+        const hash = user.avatar;
         await minio.send(
           new PutObjectCommand({
             Bucket: env.MINIO_BUCKET,
-            Key: `avatars/${id}/${user.avatar.startsWith('a_') ? 'a_' : ''}${hash}.${user.avatar.startsWith('a_') ? 'gif' : 'png'}`,
+            Key: `avatars/${id}/${hash}.${hash.startsWith('a_') ? 'gif' : 'png'}`,
             Body: imgBuffer,
             ContentType: "image/png",
           })

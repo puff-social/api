@@ -28,5 +28,5 @@ server.setNotFoundHandler((req, res) => {
 });
 
 server.listen({ port: env.PORT, host: '0.0.0.0' }, () => {
-  console.log(`Analytics > Listening on ${env.PORT}`);
+  console.log(`API > Listening on ${env.PORT}`);
 });

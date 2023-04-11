@@ -25,17 +25,17 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/dustinrouillard/puffsocial/analytics:latest,ghcr.io/dustinrouillard/puffsocial/analytics:${{ github.sha }}
+          tags: ghcr.io/dustinrouillard/puffsocial/api:latest,ghcr.io/dustinrouillard/puffsocial/api:${{ github.sha }}
 
       - uses: actions/checkout@master
       - name: Deploy to cluster
         uses: danielr1996/kubectl-action@1.0.0
         with:
           kubeconfig: ${{ secrets.KUBECONFIG }}
-          args: set image --record deployment/puffsocial-analytics app=ghcr.io/dustinrouillard/puffsocial/analytics:${{ github.sha }}
+          args: set image --record deployment/puffsocial-api app=ghcr.io/dustinrouillard/puffsocial/api:${{ github.sha }}
 
       - name: Verify deployment
         uses: danielr1996/kubectl-action@1.0.0
         with:
           kubeconfig: ${{ secrets.KUBECONFIG }}
-          args: rollout status deployment/puffsocial-analytics
+          args: rollout status deployment/puffsocial-api
