@@ -10,5 +10,6 @@ export const ProductModelMap = [
 
 export const UserFlags = {
   tester: 1 << 0,
-  admin: 1 << 1,
+  supporter: 1 << 1,
+  admin: 1 << 2,
 };
