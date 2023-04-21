@@ -59,6 +59,7 @@ model diagnostics {
   user_agent              String
   ip                      String
   session_id              String?
+  device_serial_number    String?
 }
 
 model leaderboard_positions {

@@ -1,5 +1,5 @@
 import { ZodError } from "zod";
-import { pack, unpack } from "byte-data";
+import { unpack } from "byte-data";
 import { stringify } from "querystring";
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
@@ -118,9 +118,7 @@ export function Routes(
         oldInt.toString()
       ).toString("base64")}`;
 
-      const generatedDeviceId = `device_${Buffer.from(deviceUid).toString(
-        "base64"
-      )}`;
+      const generatedDeviceId = `device_${deviceUid}`;
 
       const oldDevice = await prisma.leaderboard.findFirst({
         where: { device_id: oldGeneratedDeviceId },
