@@ -56,6 +56,7 @@ export const diagValidation = z.object({
     authenticated: z.boolean().optional(),
     pupService: z.boolean().optional(),
     loraxService: z.boolean().optional(),
+    serialNumber: z.string().optional(),
   }),
 });
 

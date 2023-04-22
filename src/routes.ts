@@ -207,6 +207,7 @@ export function Routes(
           device_uptime: validate.device_parameters.uptime,
           device_utc_time: validate.device_parameters.utc,
           device_battery_capacity: validate.device_parameters.batteryCapacity,
+          device_serial_number: validate.device_parameters.serialNumber,
           authenticated: validate.device_parameters.authenticated,
           pup: validate.device_parameters.pupService,
           lorax: validate.device_parameters.loraxService,
