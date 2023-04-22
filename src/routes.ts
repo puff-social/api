@@ -324,7 +324,9 @@ export function Routes(
             response_type: "code",
             scope: "identify",
             state,
-            redirect_uri: `${env.APPLICATION_HOST}/callback/discord`,
+            redirect_uri: `${
+              req.headers.origin || env.APPLICATION_HOST
+            }/callback/discord`,
           });
           return res.status(200).send({
             success: true,
@@ -359,7 +361,10 @@ export function Routes(
               .status(400)
               .send({ success: false, error: "invalid_state" });
 
-          const tokens = await exchangeDiscordCode(code);
+          const tokens = await exchangeDiscordCode(
+            code,
+            `${req.headers.origin || env.APPLICATION_HOST}/callback/discord`
+          );
           const user = await fetchDiscordUser(tokens.access_token);
 
           await keydb.set(
