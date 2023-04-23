@@ -208,6 +208,8 @@ export function Routes(
           device_utc_time: validate.device_parameters.utc,
           device_battery_capacity: validate.device_parameters.batteryCapacity,
           device_serial_number: validate.device_parameters.serialNumber,
+          device_hardware_version:
+            validate.device_parameters.hardwareVersion?.toString(),
           authenticated: validate.device_parameters.authenticated,
           pup: validate.device_parameters.pupService,
           lorax: validate.device_parameters.loraxService,

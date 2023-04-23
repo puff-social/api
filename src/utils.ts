@@ -57,6 +57,7 @@ export const diagValidation = z.object({
     pupService: z.boolean().optional(),
     loraxService: z.boolean().optional(),
     serialNumber: z.string().optional(),
+    hardwareVersion: z.number().optional(),
   }),
 });
 

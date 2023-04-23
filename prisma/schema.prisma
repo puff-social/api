@@ -60,6 +60,7 @@ model diagnostics {
   ip                      String
   session_id              String?
   device_serial_number    String?
+  device_hardware_version String?
 }
 
 model leaderboard_positions {
