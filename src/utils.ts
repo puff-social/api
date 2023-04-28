@@ -50,7 +50,7 @@ export const diagValidation = z.object({
     uptime: z.number().optional(),
     utc: z.number().optional(),
     batteryCapacity: z.number().optional(),
-    uid: z.string().optional(),
+    mac: z.string().optional(),
     dob: z.number().optional(),
     chamberType: z.number().optional(),
     authenticated: z.boolean().optional(),

@@ -213,7 +213,7 @@ export function Routes(
           authenticated: validate.device_parameters.authenticated,
           pup: validate.device_parameters.pupService,
           lorax: validate.device_parameters.loraxService,
-          device_uid: validate.device_parameters.uid,
+          device_mac: validate.device_parameters.mac,
           device_dob:
             validate.device_parameters.dob != 1000
               ? new Date((validate.device_parameters.dob as number) * 1000)

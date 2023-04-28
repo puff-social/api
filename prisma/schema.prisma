@@ -61,6 +61,7 @@ model diagnostics {
   session_id              String?
   device_serial_number    String?
   device_hardware_version String?
+  device_mac              String?
 }
 
 model leaderboard_positions {
