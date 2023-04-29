@@ -320,7 +320,7 @@ export function Routes(
       switch (req.params.platform) {
         case "discord": {
           const state = pika.gen("oauth");
-          await keydb.set(`oauth_state/${state}`, state, "EX", 120);
+          await keydb.set(`oauth_state/${state}`, state, "EX", 500);
           const params = stringify({
             client_id: env.DISCORD_CLIENT_ID,
             response_type: "code",
