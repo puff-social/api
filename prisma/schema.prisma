@@ -31,11 +31,12 @@ model leaderboard {
 model users {
   id            String        @id
   platform      String        @default("discord")
-  platform_id   String
+  platform_id   String        @unique(map: "pltid_pkey")
   name          String
   image         String?
   flags         Int           @default(0)
   refresh_token String
+  devices       devices[]
   leaderboard   leaderboard[]
 }
 
@@ -87,4 +88,30 @@ model strains {
   species  String?
   thc      String?
   cbd      String?
+}
+
+model device_leaderboard {
+  id       String  @id
+  position Int
+  devices  devices @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model devices {
+  id                 String              @id
+  mac                String              @unique(map: "mac_unq")
+  name               String              @default("N/A")
+  dabs               Int
+  avg_dabs           Float               @default(0.0) @db.Real
+  model              String              @default("0")
+  firmware           String
+  hardware           Int
+  git_hash           String
+  serial_number      String?
+  dob                DateTime            @db.Timestamp(6)
+  last_active        DateTime            @default(now()) @db.Timestamp(6)
+  last_ip            String?
+  user_id            String?
+  profiles           Json?
+  device_leaderboard device_leaderboard?
+  users              users?              @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

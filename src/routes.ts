@@ -1,5 +1,4 @@
 import { ZodError } from "zod";
-import { unpack } from "byte-data";
 import { stringify } from "querystring";
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
@@ -14,7 +13,6 @@ import { exchangeDiscordCode, fetchDiscordUser } from "./helpers/discord";
 import {
   diagValidation,
   feedbackValidation,
-  macAddressToUint8Array,
   sanitize,
   trackingValidation,
   verifyRequest,
@@ -37,6 +35,25 @@ export function InternalRoutes(
     return res.status(200).send({
       valid: true,
       user: sanitize(user, ["platform", "platform_id", "refresh_token"]),
+    });
+  });
+
+  next();
+}
+
+export function AdministrativeRoutes(
+  server: FastifyInstance,
+  opts: FastifyPluginOptions,
+  next: () => void
+) {
+  server.register(AuthMiddleware, { required: true, admin: true });
+
+  server.get("/devices", async (req, res) => {
+    return res.status(200).send({
+      success: true,
+      data: {
+        admin: true,
+      },
     });
   });
 
@@ -69,111 +86,126 @@ export function Routes(
 ) {
   server.register(AuthMiddleware);
 
-  server.get("/leaderboard", async (req, res) => {
-    const leaderboards = await prisma.leaderboard.findMany({
-      orderBy: { total_dabs: "desc" },
-      take: 10,
-      include: {
-        users: {
-          select: {
-            name: true,
-            image: true,
-            flags: true,
-            platform: true,
-            platform_id: true,
+  server.get(
+    "/leaderboard",
+    async (req: FastifyRequest<{ Querystring: { limit?: string } }>, res) => {
+      const leaderboard = await prisma.device_leaderboard.findMany({
+        orderBy: { position: "asc" },
+        take: Number(req.query.limit) || 25,
+        include: {
+          devices: {
+            include: {
+              users: {
+                select: {
+                  name: true,
+                  image: true,
+                  flags: true,
+                  platform: true,
+                  platform_id: true,
+                },
+              },
+            },
           },
         },
-      },
-    });
-    for (const lb of leaderboards) sanitize(lb, ["last_ip"]);
+      });
 
-    return res.status(200).send({ success: true, data: { leaderboards } });
-  });
+      for (const lb of leaderboard)
+        sanitize(lb.devices, [
+          "mac",
+          "git_hash",
+          "profiles",
+          "last_ip",
+          "serial_number",
+        ]);
+
+      return res
+        .status(200)
+        .send({ success: true, data: { leaderboards: leaderboard } });
+    }
+  );
 
   server.post("/track", async (req, res) => {
     if (!req.headers["x-signature"])
       return res.status(400).send({ code: "invalid_tracking_data" });
-    const body = await verifyRequest(
+    const body = verifyRequest(
       Buffer.from(req.rawBody as string, "base64"),
       req.headers["x-signature"] as string
     );
     try {
       const validate = await trackingValidation.parseAsync(body);
 
-      const id = pika.gen("leaderboard");
       const ip = (req.headers["cf-connecting-ip"] ||
         req.socket.remoteAddress ||
         "0.0.0.0") as string;
-
-      const oldMac = macAddressToUint8Array(validate.device.mac.substring(3));
-      const oldInt = unpack(oldMac, { bits: 32 });
-
-      const deviceUid = Buffer.from(validate.device.mac).toString("base64");
 
       const date = new Date(validate.device.dob * 1000);
       if (isNaN(date.getTime()))
         return res.status(400).send({ code: "invalid_tracking_data" });
 
-      const oldGeneratedDeviceId = `device_${Buffer.from(
-        oldInt.toString()
-      ).toString("base64")}`;
-
-      const generatedDeviceId = `device_${deviceUid}`;
-
-      const oldDevice = await prisma.leaderboard.findFirst({
-        where: { device_id: oldGeneratedDeviceId },
-      });
-      if (oldDevice)
-        await prisma.leaderboard.update({
-          data: { device_id: generatedDeviceId },
-          where: { id: oldDevice.id },
-        });
-
-      const existing = await prisma.leaderboard.findFirst({
-        where: { device_id: generatedDeviceId },
+      const existing = await prisma.devices.findFirst({
+        where: { mac: validate.device.mac },
       });
       if (existing) {
-        await prisma.leaderboard.update({
+        await prisma.devices.update({
           data: {
-            device_name: validate.device.name,
-            device_dob: date,
-            device_model: validate.device.model,
-            owner_name: validate.name,
-            total_dabs: validate.device.totalDabs,
+            name: validate.device.name,
+            dabs: validate.device.totalDabs,
+            avg_dabs: validate.device.dabsPerDay,
+            model: validate.device.model,
+            firmware: validate.device.firmware,
+            hardware: validate.device.hardware,
+            git_hash: validate.device.gitHash,
+            dob: new Date(validate.device.dob * 1000),
             last_active: new Date().toISOString(),
             last_ip: ip,
             ...(req.user ? { user_id: req.user.id } : {}),
           },
           where: {
-            device_id: generatedDeviceId,
+            mac: validate.device.mac,
           },
         });
       } else {
-        await prisma.leaderboard.create({
+        const id = pika.gen("device");
+        await prisma.devices.create({
           data: {
             id,
-            device_id: generatedDeviceId,
-            device_name: validate.device.name,
-            device_dob: new Date(validate.device.dob * 1000),
-            device_model: validate.device.model,
-            owner_name: validate.name,
-            total_dabs: validate.device.totalDabs,
+            name: validate.device.name,
+            mac: validate.device.mac,
+            dabs: validate.device.totalDabs,
+            avg_dabs: validate.device.dabsPerDay,
+            model: validate.device.model,
+            firmware: validate.device.firmware,
+            hardware: validate.device.hardware,
+            git_hash: validate.device.gitHash,
+            dob: new Date(validate.device.dob * 1000),
+            last_active: new Date().toISOString(),
             last_ip: ip,
             ...(req.user ? { user_id: req.user.id } : {}),
           },
         });
       }
 
-      const leaderboard = await prisma.leaderboard.findMany({
-        orderBy: { total_dabs: "desc" },
+      const device = await prisma.devices.findFirst({
+        where: { mac: validate.device.mac },
+      });
+
+      const pos = await prisma.device_leaderboard.findFirst({
+        where: { id: device?.id },
       });
 
       return res.status(200).send({
         success: true,
         data: {
-          device: leaderboard.find((d) => d.device_id == generatedDeviceId),
-          position:
-            leaderboard.findIndex((d) => d.device_id == generatedDeviceId) + 1,
+          device: sanitize(device, [
+            "mac",
+            "model",
+            "hardware",
+            "serial_number",
+            "dob",
+            "last_ip",
+            "user_id",
+          ]),
+          position: pos?.position,
         },
       });
     } catch (error) {
@@ -184,7 +216,7 @@ export function Routes(
   server.post("/diag", async (req, res) => {
     if (!req.headers["x-signature"])
       return res.status(400).send({ code: "invalid_diag_data" });
-    const body = await verifyRequest(
+    const body = verifyRequest(
       Buffer.from(req.rawBody as string, "base64"),
       req.headers["x-signature"] as string
     );
@@ -197,6 +229,22 @@ export function Routes(
     const userAgent = req.headers["user-agent"];
 
     try {
+      const device = await prisma.devices.findFirst({
+        where: { mac: validate.device_parameters.mac },
+      });
+
+      if (device) {
+        await prisma.devices.update({
+          data: {
+            profiles: validate.device_profiles,
+            serial_number: validate.device_parameters.serialNumber,
+          },
+          where: {
+            mac: validate.device_parameters.mac,
+          },
+        });
+      }
+
       await prisma.diagnostics.create({
         data: {
           id,
@@ -238,7 +286,7 @@ export function Routes(
     try {
       if (!req.headers["x-signature"])
         return res.status(400).send({ code: "invalid_feedback_request" });
-      const body = await verifyRequest(
+      const body = verifyRequest(
         Buffer.from(req.rawBody as string, "base64"),
         req.headers["x-signature"] as string
       );
@@ -276,8 +324,8 @@ export function Routes(
     "/device/:device_id",
     async (req: FastifyRequest<{ Params: { device_id: string } }>, res) => {
       try {
-        const device = await prisma.leaderboard.findFirst({
-          where: { device_id: req.params.device_id },
+        const device = await prisma.devices.findFirst({
+          where: { id: req.params.device_id },
           include: {
             users: {
               select: {
@@ -290,18 +338,25 @@ export function Routes(
             },
           },
         });
+
         if (!device)
           return res
             .status(404)
             .send({ success: false, error: { code: "device_not_found" } });
-        const position = await prisma.leaderboard_positions.findFirst({
-          where: { device_id: device.device_id },
+        const position = await prisma.device_leaderboard.findFirst({
+          where: { id: device.id },
         });
 
         return res.status(200).send({
           success: true,
           data: {
-            device: sanitize(device, ["last_ip"]),
+            device: sanitize(device, [
+              "mac",
+              "git_hash",
+              "profiles",
+              "last_ip",
+              "serial_number",
+            ]),
             position: position?.position,
           },
         });
@@ -384,7 +439,6 @@ export function Routes(
             const session = pika.gen("session");
             await keydb.set(`sessions/${session}`, existingUser.id);
 
-            console.log(user.avatar, existingUser.image);
             if (user.avatar != existingUser.image) {
               if (existingUser.image)
                 await minio.send(

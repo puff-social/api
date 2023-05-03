@@ -1,25 +1,25 @@
 -- Recalculate leaderboard positions function --
-CREATE OR REPLACE FUNCTION public.recalc_positions()
+CREATE OR REPLACE FUNCTION public.recalc_leaderboard()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
 BEGIN
-  INSERT INTO leaderboard_positions (device_id, position)
+  INSERT INTO device_leaderboard (id, position)
 SELECT
-  device_id,
-  RANK() OVER (ORDER BY total_dabs DESC)
+  id,
+  RANK() OVER (ORDER BY dabs DESC)
 FROM
-  leaderboard ON CONFLICT (device_id)
+  devices ON CONFLICT (id)
   DO
   UPDATE
   SET
     position = EXCLUDED.position;
   RETURN NEW;
 END
-$function$;
+$function$
 
 -- Call the recalc_position() function when leaderboard UPDATEs --
-CREATE TRIGGER leaderboard_recalc_user_positions
-	AFTER UPDATE ON leaderboard
+CREATE TRIGGER device_recalc_on_update
+	AFTER UPDATE ON devices
 	FOR EACH ROW
-	EXECUTE PROCEDURE recalc_positions ();
+	EXECUTE PROCEDURE recalc_leaderboard ();

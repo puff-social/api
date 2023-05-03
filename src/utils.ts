@@ -19,7 +19,11 @@ export const trackingValidation = z.object({
     mac,
     name: z.string().max(32),
     totalDabs: z.number(),
+    dabsPerDay: z.number(),
     model: z.enum(ProductModelMap),
+    firmware: z.string(),
+    hardware: z.number(),
+    gitHash: z.string().max(7),
   }),
 });
 
