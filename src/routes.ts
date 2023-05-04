@@ -48,14 +48,34 @@ export function AdministrativeRoutes(
 ) {
   server.register(AuthMiddleware, { required: true, admin: true });
 
-  server.get("/devices", async (req, res) => {
-    return res.status(200).send({
-      success: true,
-      data: {
-        admin: true,
-      },
-    });
-  });
+  server.get(
+    "/devices",
+    async (req: FastifyRequest<{ Querystring: { limit?: string } }>, res) => {
+      const leaderboard = await prisma.device_leaderboard.findMany({
+        orderBy: { position: "asc" },
+        take: Number(req.query.limit) || 25,
+        include: {
+          devices: {
+            include: {
+              users: {
+                select: {
+                  name: true,
+                  image: true,
+                  flags: true,
+                  platform: true,
+                  platform_id: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return res
+        .status(200)
+        .send({ success: true, data: { devices: leaderboard } });
+    }
+  );
 
   next();
 }
