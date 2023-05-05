@@ -341,11 +341,16 @@ export function Routes(
   });
 
   server.get(
-    "/device/:device_id",
-    async (req: FastifyRequest<{ Params: { device_id: string } }>, res) => {
+    "/device/:device_mac",
+    async (req: FastifyRequest<{ Params: { device_mac: string } }>, res) => {
       try {
         const device = await prisma.devices.findFirst({
-          where: { id: req.params.device_id },
+          where: {
+            mac: Buffer.from(
+              req.params.device_mac.split("_")[1],
+              "base64"
+            ).toString(),
+          },
           include: {
             users: {
               select: {
