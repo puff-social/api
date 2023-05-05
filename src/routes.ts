@@ -17,12 +17,15 @@ import {
   trackingValidation,
   verifyRequest,
 } from "./utils";
+import { getDevicesRoute } from "./methods/devices";
 
 export function InternalRoutes(
   server: FastifyInstance,
   opts: FastifyPluginOptions,
   next: () => void
 ) {
+  server.get("/devices", getDevicesRoute);
+
   server.get("/verify", async (req, res) => {
     const authorization = req.headers.authorization;
     if (!authorization) return res.status(200).send({ valid: false });
@@ -48,34 +51,7 @@ export function AdministrativeRoutes(
 ) {
   server.register(AuthMiddleware, { required: true, admin: true });
 
-  server.get(
-    "/devices",
-    async (req: FastifyRequest<{ Querystring: { limit?: string } }>, res) => {
-      const leaderboard = await prisma.device_leaderboard.findMany({
-        orderBy: { position: "asc" },
-        take: req.query.limit ? Number(req.query.limit) : undefined,
-        include: {
-          devices: {
-            include: {
-              users: {
-                select: {
-                  name: true,
-                  image: true,
-                  flags: true,
-                  platform: true,
-                  platform_id: true,
-                },
-              },
-            },
-          },
-        },
-      });
-
-      return res
-        .status(200)
-        .send({ success: true, data: { devices: leaderboard } });
-    }
-  );
+  server.get("/devices", getDevicesRoute);
 
   next();
 }
