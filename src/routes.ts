@@ -53,7 +53,7 @@ export function AdministrativeRoutes(
     async (req: FastifyRequest<{ Querystring: { limit?: string } }>, res) => {
       const leaderboard = await prisma.device_leaderboard.findMany({
         orderBy: { position: "asc" },
-        take: Number(req.query.limit) || 25,
+        take: req.query.limit ? Number(req.query.limit) : undefined,
         include: {
           devices: {
             include: {
