@@ -88,6 +88,7 @@ export function Routes(
       const leaderboard = await prisma.device_leaderboard.findMany({
         orderBy: { position: "asc" },
         take: Number(req.query.limit) || 25,
+        where: { devices: { users: { isNot: null } } },
         include: {
           devices: {
             include: {
