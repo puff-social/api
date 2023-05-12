@@ -36,6 +36,7 @@ export async function getDevicesRoute(
           ? {
               version: ota.version,
               gitHash: ota.fileMedia.filename.split("-")[2],
+              date: ota.fileMedia.created,
             }
           : undefined,
       };
