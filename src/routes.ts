@@ -1,4 +1,5 @@
 import { ZodError } from "zod";
+import { JwtPayload, decode } from "jsonwebtoken";
 import { stringify } from "querystring";
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
@@ -606,6 +607,9 @@ export function Routes(
       const login = await puffcoLogin(email, password);
       const puffcoUser = await fetchUser(login.accessToken);
 
+      const decodedAccessToken = decode(login.accessToken) as JwtPayload;
+      const decodedRefreshToken = decode(login.refreshToken) as JwtPayload;
+
       const existingUser = await prisma.users.findFirst({
         where: { platform_id: puffcoUser.id.toString(), platform: "puffco" },
       });
@@ -623,6 +627,20 @@ export function Routes(
             platform_verified: puffcoUser.verified,
           },
         });
+
+        await keydb.set(
+          `tokens/puffco/${existingUser.id}/refresh_token`,
+          login.refreshToken,
+          "EXAT",
+          Math.floor(decodedRefreshToken.exp as number)
+        );
+
+        await keydb.set(
+          `tokens/puffco/${existingUser.id}/access_token`,
+          login.accessToken,
+          "EXAT",
+          Math.floor(decodedAccessToken.exp as number)
+        );
 
         return res.status(200).send({
           success: true,
@@ -650,6 +668,20 @@ export function Routes(
 
       const session = pika.gen("session");
       await keydb.set(`sessions/${session}`, id);
+
+      await keydb.set(
+        `tokens/puffco/${id}/refresh_token`,
+        login.refreshToken,
+        "EXAT",
+        Math.floor(decodedRefreshToken.exp as number)
+      );
+
+      await keydb.set(
+        `tokens/puffco/${id}/access_token`,
+        login.accessToken,
+        "EXAT",
+        Math.floor(decodedAccessToken.exp as number)
+      );
 
       return res.status(200).send({
         success: true,
