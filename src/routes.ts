@@ -157,6 +157,9 @@ export function Routes(
                   flags: true,
                   platform: true,
                   platform_id: true,
+                  name_display: true,
+                  first_name: true,
+                  last_name: true,
                 },
               },
             },
@@ -164,7 +167,7 @@ export function Routes(
         },
       });
 
-      for (const lb of leaderboard)
+      for (const lb of leaderboard) {
         sanitize(lb.devices, [
           "mac",
           "git_hash",
@@ -172,6 +175,17 @@ export function Routes(
           "last_ip",
           "serial_number",
         ]);
+
+        if (lb.devices.users)
+          sanitize(
+            lb.devices.users,
+            lb.devices.users?.name_display == NameDisplay.FirstName
+              ? ["last_name"]
+              : lb.devices.users?.name_display == NameDisplay.FirstLast
+              ? []
+              : ["first_name", "last_name"]
+          );
+      }
 
       return res
         .status(200)
