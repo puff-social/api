@@ -1,5 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { prisma } from "../connectivity/prsima";
+import { getOtaLatest } from "../helpers/puffco";
 
 export async function getDevicesRoute(
   req: FastifyRequest<{ Querystring: { limit?: string } }>,
@@ -25,7 +26,21 @@ export async function getDevicesRoute(
     },
   });
 
-  return res
-    .status(200)
-    .send({ success: true, data: { devices: leaderboard } });
+  const newDevices = await Promise.all(
+    leaderboard.map(async (lb) => {
+      if (!lb.devices.serial_number) return lb;
+      const ota = await getOtaLatest(lb.devices.serial_number);
+      return {
+        ...lb,
+        ota: ota
+          ? {
+              version: ota.version,
+              gitHash: ota.fileMedia.filename.split("-")[2],
+            }
+          : undefined,
+      };
+    })
+  );
+
+  return res.status(200).send({ success: true, data: { devices: newDevices } });
 }

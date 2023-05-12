@@ -12,6 +12,10 @@ const mac = z.custom<string>((val) => {
   return /^([0-9A-F]{2}[:]){5}([0-9A-F]{2})$/.test(val as string);
 });
 
+export const userUpdateValidation = z.object({
+  name_display: z.number().min(0).max(2),
+});
+
 export const trackingValidation = z.object({
   name: z.string().max(32),
   device: z.object({

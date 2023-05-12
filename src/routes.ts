@@ -15,9 +15,13 @@ import {
   feedbackValidation,
   sanitize,
   trackingValidation,
+  userUpdateValidation,
   verifyRequest,
 } from "./utils";
 import { getDevicesRoute } from "./methods/devices";
+import { fetchUser, login as puffcoLogin } from "./helpers/puffco";
+import { users } from "@prisma/client";
+import { NameDisplay } from "./constants";
 
 export function InternalRoutes(
   server: FastifyInstance,
@@ -37,7 +41,15 @@ export function InternalRoutes(
 
     return res.status(200).send({
       valid: true,
-      user: sanitize(user, ["platform", "platform_id", "refresh_token"]),
+      user: sanitize(user, [
+        "platform_id",
+        "refresh_token",
+        ...(user?.name_display == NameDisplay.FirstName
+          ? ["last_name"]
+          : user?.name_display == NameDisplay.FirstLast
+          ? []
+          : ["first_name", "last_name"]),
+      ]),
     });
   });
 
@@ -67,9 +79,54 @@ export function AuthedRoutes(
     return res.status(200).send({
       success: true,
       data: {
-        user: sanitize(req.user, ["platform", "platform_id", "refresh_token"]),
+        user: sanitize(req.user, ["platform_id", "refresh_token"]),
       },
     });
+  });
+
+  server.patch(
+    "/user",
+    async (req: FastifyRequest<{ Body: Pick<users, "name_display"> }>, res) => {
+      const validate = await userUpdateValidation.parseAsync(req.body);
+
+      const user = await prisma.users.update({
+        where: { id: req.user.id },
+        data: validate,
+      });
+
+      return res.status(200).send({
+        success: true,
+        data: {
+          user: sanitize(user, ["platform_id", "refresh_token"]),
+        },
+      });
+    }
+  );
+
+  server.get("/puffco/profiles", async (req, res) => {
+    if (req.user.platform != "puffco")
+      return res
+        .status(400)
+        .send({ error: true, code: "invalid_user_platform" });
+
+    // get token for the user and regen if required
+
+    // get the users heat profiles
+
+    return res.status(200).send();
+  });
+
+  server.get("/puffco/moodlights", async (req, res) => {
+    if (req.user.platform != "puffco")
+      return res
+        .status(400)
+        .send({ error: true, code: "invalid_user_platform" });
+
+    // get token for the user and regen if required
+
+    // get the users moodlights
+
+    return res.status(200).send();
   });
 
   next();
@@ -435,7 +492,7 @@ export function Routes(
           await keydb.del(`oauth_state/${state}`);
 
           const existingUser = await prisma.users.findFirst({
-            where: { platform_id: user.id },
+            where: { platform_id: user.id, platform: "discord" },
           });
           if (existingUser) {
             const session = pika.gen("session");
@@ -481,11 +538,7 @@ export function Routes(
             return res.status(200).send({
               success: true,
               data: {
-                user: sanitize(existingUser, [
-                  "platform",
-                  "platform_id",
-                  "refresh_token",
-                ]),
+                user: sanitize(existingUser, ["platform_id", "refresh_token"]),
                 token: session,
               },
             });
@@ -519,6 +572,7 @@ export function Routes(
               platform_id: user.id,
               image: hash,
               refresh_token: tokens.refresh_token,
+              platform_verified: true,
             },
           });
 
@@ -539,6 +593,71 @@ export function Routes(
             .send({ success: false, error: "invalid_platform" });
         }
       }
+    }
+  );
+
+  server.post(
+    "/auth/puffco",
+    async (
+      req: FastifyRequest<{ Body: { email: string; password: string } }>,
+      res
+    ) => {
+      const { email, password } = req.body;
+      const login = await puffcoLogin(email, password);
+      const puffcoUser = await fetchUser(login.accessToken);
+
+      const existingUser = await prisma.users.findFirst({
+        where: { platform_id: puffcoUser.id.toString(), platform: "puffco" },
+      });
+
+      if (existingUser) {
+        const session = pika.gen("session");
+        await keydb.set(`sessions/${session}`, existingUser.id);
+
+        await prisma.users.update({
+          where: { id: existingUser.id },
+          data: {
+            name: puffcoUser.username,
+            first_name: puffcoUser.firstName,
+            last_name: puffcoUser.lastName,
+            platform_verified: puffcoUser.verified,
+          },
+        });
+
+        return res.status(200).send({
+          success: true,
+          data: {
+            user: sanitize(existingUser, ["platform_id", "refresh_token"]),
+            token: session,
+          },
+        });
+      }
+
+      const id = pika.gen("user");
+
+      await prisma.users.create({
+        data: {
+          id,
+          name: puffcoUser.username,
+          platform: "puffco",
+          platform_id: puffcoUser.id.toString(),
+          refresh_token: null,
+          first_name: puffcoUser.firstName,
+          last_name: puffcoUser.lastName,
+          platform_verified: puffcoUser.verified,
+        },
+      });
+
+      const session = pika.gen("session");
+      await keydb.set(`sessions/${session}`, id);
+
+      return res.status(200).send({
+        success: true,
+        data: {
+          user: { id, name: puffcoUser.username, image: null },
+          token: session,
+        },
+      });
     }
   );
 

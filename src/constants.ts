@@ -14,6 +14,12 @@ export const UserFlags = {
   admin: 1 << 2,
 };
 
+export enum NameDisplay {
+  Default, // Uses name field (Discord username/display name) (Puffco account username)
+  FirstName, // Shows first name (Only an option if platform is puffco)
+  FirstLast, // Shows first + last name (Only an option if platform is puffco)
+}
+
 export const AuthorizedOAuthOrigins = [
   "tester.puff.social",
   "puff.social",

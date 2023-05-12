@@ -29,15 +29,19 @@ model leaderboard {
 }
 
 model users {
-  id            String        @id
-  platform      String        @default("discord")
-  platform_id   String        @unique(map: "pltid_pkey")
-  name          String
-  image         String?
-  flags         Int           @default(0)
-  refresh_token String
-  devices       devices[]
-  leaderboard   leaderboard[]
+  id                String        @id
+  platform          String        @default("discord")
+  platform_id       String        @unique(map: "pltid_pkey")
+  name              String
+  image             String?
+  flags             Int           @default(0)
+  refresh_token     String?
+  first_name        String?
+  last_name         String?
+  name_display      Int           @default(0) @db.SmallInt
+  platform_verified Boolean?
+  devices           devices[]
+  leaderboard       leaderboard[]
 }
 
 model diagnostics {
