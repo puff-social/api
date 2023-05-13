@@ -95,9 +95,10 @@ model strains {
 }
 
 model device_leaderboard {
-  id       String  @id
-  position Int
-  devices  devices @relation(fields: [id], references: [id], onDelete: Cascade)
+  id           String  @id
+  position     Int
+  avg_position Int?
+  devices      devices @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model devices {
@@ -118,4 +119,9 @@ model devices {
   profiles           Json?
   device_leaderboard device_leaderboard?
   users              users?              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model user_leaderboard {
+  id       String @id
+  position Int    @db.SmallInt
 }
