@@ -13,35 +13,17 @@ model feedback {
   ip      String
 }
 
-model leaderboard {
-  id                    String                 @id
-  device_id             String                 @unique(map: "leaderboard_index")
-  device_dob            DateTime               @db.Timestamp(6)
-  device_name           String
-  total_dabs            Int
-  owner_name            String
-  last_active           DateTime               @default(now()) @db.Timestamp(6)
-  last_ip               String?
-  device_model          String?
-  user_id               String?
-  users                 users?                 @relation(fields: [user_id], references: [id])
-  leaderboard_positions leaderboard_positions?
-}
-
 model users {
-  id                String        @id
-  platform          String        @default("discord")
-  platform_id       String        @unique(map: "pltid_pkey")
-  name              String
-  image             String?
-  flags             Int           @default(0)
-  refresh_token     String?
-  first_name        String?
-  last_name         String?
-  name_display      Int           @default(0) @db.SmallInt
-  platform_verified Boolean?
-  devices           devices[]
-  leaderboard       leaderboard[]
+  id           String        @id
+  name         String
+  display_name String?
+  image        String?
+  banner       String?
+  flags        Int           @default(0)
+  bio          String?
+  accounts     accounts[]
+  connections  connections[]
+  sessions     sessions[]
 }
 
 model diagnostics {
@@ -67,21 +49,6 @@ model diagnostics {
   device_serial_number    String?
   device_hardware_version String?
   device_mac              String?
-}
-
-model leaderboard_positions {
-  device_id   String      @id
-  position    Int
-  leaderboard leaderboard @relation(fields: [device_id], references: [device_id], onDelete: Cascade)
-}
-
-model old_diagnostics {
-  id              String @id(map: "diagnostics_pkey")
-  device_name     String
-  device_firmware String
-  device_model    String
-  user_agent      String
-  ip              String
 }
 
 model strains {
@@ -118,10 +85,53 @@ model devices {
   user_id            String?
   profiles           Json?
   device_leaderboard device_leaderboard?
-  users              users?              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  users              old_users?          @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-model user_leaderboard {
-  id       String @id
-  position Int    @db.SmallInt
+model accounts {
+  id        String     @id
+  email     String     @unique(map: "email_unq")
+  password  String
+  user_id   String
+  old_users users      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  sessions  sessions[]
+}
+
+model connections {
+  id          String     @id
+  platform    String     @default("discord")
+  platform_id String?
+  user_id     String
+  verified    Boolean    @default(false)
+  users       users      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  sessions    sessions[]
+
+  @@unique([platform, platform_id], map: "platform_acc_unq")
+}
+
+model old_users {
+  id                String    @id(map: "dusers_pkey")
+  platform          String    @default("discord")
+  platform_id       String    @unique(map: "pltid_pkey")
+  name              String
+  image             String?
+  flags             Int       @default(0)
+  refresh_token     String?
+  first_name        String?
+  last_name         String?
+  name_display      Int       @default(0) @db.SmallInt
+  platform_verified Boolean?
+  devices           devices[]
+}
+
+model sessions {
+  user_id       String
+  connection_id String?
+  account_id    String?
+  user_agent    String
+  ip            String
+  token         String       @id
+  accounts      accounts?    @relation(fields: [account_id], references: [id], onDelete: Cascade)
+  connections   connections? @relation(fields: [connection_id], references: [id], onDelete: Cascade)
+  users         users        @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

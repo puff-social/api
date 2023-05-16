@@ -7,6 +7,8 @@ const prefixes = [
   "strain",
   "user",
   "device",
+  "connection",
+  "account",
   {
     prefix: "oauth",
     secure: true,

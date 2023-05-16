@@ -1,5 +1,5 @@
 import fp from "fastify-plugin";
-import { users } from "@prisma/client";
+import { connections, users } from "@prisma/client";
 import { FastifyPluginAsync } from "fastify/types/plugin";
 
 import { keydb } from "./connectivity/redis";
@@ -9,6 +9,7 @@ import { UserFlags } from "./constants";
 declare module "fastify" {
   interface FastifyRequest {
     user: users;
+    linkedConnection: connections;
   }
 }
 
@@ -28,19 +29,33 @@ const middlewareCallback: FastifyPluginAsync<AuthOptions> = async function (
         .status(403)
         .send({ error: true, code: "missing_authorization" });
 
-    const session = await keydb.get(`sessions/${authorization}`);
+    const session = (await keydb.hgetall(`sessions/${authorization}`)) as {
+      user_id: string;
+      connection_id: string;
+    };
     if (!session && options.required)
       return res
         .status(403)
         .send({ error: true, code: "invalid_authentication" });
 
     if (session) {
-      const user = await prisma.users.findFirst({ where: { id: session } });
+      const user = await prisma.users.findFirst({
+        where: { id: session.user_id },
+      });
       if (!user && options.required)
         return res
           .status(403)
           .send({ error: true, code: "invalid_authentication" });
       if (user) req.user = user;
+
+      const connnection = await prisma.connections.findFirst({
+        where: { id: session.connection_id },
+      });
+      if (!user && options.required)
+        return res
+          .status(403)
+          .send({ error: true, code: "invalid_authentication" });
+      if (connnection) req.linkedConnection = connnection;
 
       if (options.admin && !((user?.flags || 0) & UserFlags.admin))
         return res
