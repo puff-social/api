@@ -14,7 +14,7 @@ const mac = z.custom<string>((val) => {
 
 export const userUpdateValidation = z.object({
   display_name: z.string().max(48).optional(),
-  bio: z.string().max(768).optional(),
+  bio: z.string().max(256).optional(),
 });
 
 export const trackingValidation = z.object({
