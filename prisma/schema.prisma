@@ -23,6 +23,7 @@ model users {
   bio          String?
   accounts     accounts[]
   connections  connections[]
+  devices      devices[]
   sessions     sessions[]
 }
 
@@ -85,43 +86,28 @@ model devices {
   user_id            String?
   profiles           Json?
   device_leaderboard device_leaderboard?
-  users              old_users?          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  users              users?              @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model accounts {
-  id        String     @id
-  email     String     @unique(map: "email_unq")
-  password  String
-  user_id   String
-  old_users users      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  sessions  sessions[]
+  id       String     @id
+  email    String     @unique(map: "email_unq")
+  password String
+  user_id  String
+  users    users      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  sessions sessions[]
 }
 
 model connections {
   id          String     @id
   platform    String     @default("discord")
   platform_id String?
-  user_id     String
+  user_id     String?
   verified    Boolean    @default(false)
-  users       users      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  users       users?     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   sessions    sessions[]
 
   @@unique([platform, platform_id], map: "platform_acc_unq")
-}
-
-model old_users {
-  id                String    @id(map: "dusers_pkey")
-  platform          String    @default("discord")
-  platform_id       String    @unique(map: "pltid_pkey")
-  name              String
-  image             String?
-  flags             Int       @default(0)
-  refresh_token     String?
-  first_name        String?
-  last_name         String?
-  name_display      Int       @default(0) @db.SmallInt
-  platform_verified Boolean?
-  devices           devices[]
 }
 
 model sessions {
@@ -130,7 +116,7 @@ model sessions {
   account_id    String?
   user_agent    String
   ip            String
-  token         String       @id
+  token         String       @id(map: "sess_pkey")
   accounts      accounts?    @relation(fields: [account_id], references: [id], onDelete: Cascade)
   connections   connections? @relation(fields: [connection_id], references: [id], onDelete: Cascade)
   users         users        @relation(fields: [user_id], references: [id], onDelete: Cascade)
