@@ -102,9 +102,9 @@ model connections {
   id          String     @id
   platform    String     @default("discord")
   platform_id String?
-  user_id     String?
+  user_id     String
   verified    Boolean    @default(false)
-  users       users?     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  users       users      @relation(fields: [user_id], references: [id], onDelete: Cascade)
   sessions    sessions[]
 
   @@unique([platform, platform_id], map: "platform_acc_unq")

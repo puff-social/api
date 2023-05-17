@@ -12,15 +12,7 @@ export async function getDevicesRoute(
     include: {
       devices: {
         include: {
-          users: {
-            select: {
-              name: true,
-              image: true,
-              flags: true,
-              platform: true,
-              platform_id: true,
-            },
-          },
+          users: true,
         },
       },
     },

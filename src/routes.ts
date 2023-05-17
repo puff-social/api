@@ -152,22 +152,11 @@ export function Routes(
       const leaderboards = await prisma.device_leaderboard.findMany({
         orderBy: { position: "asc" },
         take: Number(req.query.limit) || 25,
-        where: { devices: { users: { isNot: null } } },
+        where: { devices: { isNot: { user_id: null } } },
         include: {
           devices: {
             include: {
-              users: {
-                select: {
-                  name: true,
-                  image: true,
-                  flags: true,
-                  platform: true,
-                  platform_id: true,
-                  name_display: true,
-                  first_name: true,
-                  last_name: true,
-                },
-              },
+              users: true,
             },
           },
         },
@@ -395,15 +384,7 @@ export function Routes(
             ).toString(),
           },
           include: {
-            users: {
-              select: {
-                name: true,
-                image: true,
-                flags: true,
-                platform: true,
-                platform_id: true,
-              },
-            },
+            users: true,
           },
         });
 
