@@ -5,15 +5,16 @@ import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
 
 import { env } from "./env";
-import { pika } from "./pika";
-import { keydb } from "./connectivity/redis";
 import { minio } from "./connectivity/minio";
-import { prisma } from "./connectivity/prsima";
+import { users, pika } from "@puff-social/commons";
+import { keydb } from "@puff-social/commons/dist/connectivity/keydb";
 import { AuthMiddleware } from "./middleware";
 import { exchangeDiscordCode, fetchDiscordUser } from "./helpers/discord";
 import {
   diagValidation,
   feedbackValidation,
+  loginValidation,
+  registerValidation,
   sanitize,
   trackingValidation,
   userUpdateValidation,
@@ -21,7 +22,8 @@ import {
 } from "./utils";
 import { getDevicesRoute } from "./methods/devices";
 import { fetchUser, login as puffcoLogin } from "./helpers/puffco";
-import { users } from "@prisma/client";
+import { hash, verify } from "argon2";
+import { prisma } from "./connectivity/prisma";
 
 export function InternalRoutes(
   server: FastifyInstance,
@@ -300,9 +302,9 @@ export function Routes(
       await prisma.diagnostics.create({
         data: {
           id,
-          device_name: validate.device_parameters.name,
+          device_name: validate.device_parameters.name as string,
           device_model: validate.device_parameters.model,
-          device_firmware: validate.device_parameters.firmware,
+          device_firmware: validate.device_parameters.firmware as string,
           device_git_hash: validate.device_parameters.hash,
           device_uptime: validate.device_parameters.uptime,
           device_utc_time: validate.device_parameters.utc,
@@ -775,6 +777,129 @@ export function Routes(
       });
     }
   );
+
+  server.post("/auth", async (req: FastifyRequest, res) => {
+    const { email, password } = await loginValidation.parseAsync(req.body);
+    const account = await prisma.accounts.findFirst({
+      include: { users: true },
+      where: {
+        email: email.toLowerCase(),
+      },
+    });
+
+    if (!account)
+      return res.status(400).send({
+        error: true,
+        code: "email_not_registered",
+      });
+
+    const check = await verify(account.password, password);
+    if (!check)
+      return res.status(400).send({
+        error: true,
+        code: "invalid_password",
+      });
+
+    const session = pika.gen("session");
+    await keydb.hset(`sessions/${session}`, {
+      user_id: account.user_id,
+      account_id: account.id,
+    });
+
+    await prisma.sessions.create({
+      data: {
+        ip: (req.headers["cf-connecting-ip"] ||
+          req.socket.remoteAddress ||
+          "0.0.0.0") as string,
+        token: session,
+        user_agent: req.headers["user-agent"] || "N/A",
+        user_id: account.user_id,
+        account_id: account.id,
+      },
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        user: account.users,
+        token: session,
+      },
+    });
+  });
+
+  server.post("/auth/create", async (req: FastifyRequest, res) => {
+    const { username, display_name, email, password } =
+      await registerValidation.parseAsync(req.body);
+    const account = await prisma.accounts.findFirst({
+      where: {
+        email: email.toLowerCase(),
+      },
+    });
+
+    if (account)
+      return res.status(400).send({
+        error: true,
+        code: "email_already_registered",
+      });
+
+    const user = await prisma.users.findFirst({
+      where: {
+        name: { equals: username, mode: "insensitive" },
+      },
+    });
+
+    if (user)
+      return res.status(400).send({
+        error: true,
+        code: "username_taken",
+      });
+
+    const id = pika.gen("user");
+    const account_id = pika.gen("account");
+
+    await prisma.users.create({
+      data: {
+        id,
+        name: username,
+        display_name,
+      },
+    });
+
+    await prisma.accounts.create({
+      data: {
+        id: account_id,
+        email: email.toLowerCase(),
+        password: await hash(password),
+        user_id: id,
+      },
+    });
+
+    const session = pika.gen("session");
+    await keydb.hset(`sessions/${session}`, {
+      user_id: id,
+      account_id,
+    });
+
+    await prisma.sessions.create({
+      data: {
+        ip: (req.headers["cf-connecting-ip"] ||
+          req.socket.remoteAddress ||
+          "0.0.0.0") as string,
+        token: session,
+        user_agent: req.headers["user-agent"] || "N/A",
+        user_id: id,
+        account_id,
+      },
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        user: { id, name: username, display_name, image: null },
+        token: session,
+      },
+    });
+  });
 
   return next();
 }

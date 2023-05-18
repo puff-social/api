@@ -1,10 +1,10 @@
 import fp from "fastify-plugin";
-import { connections, users } from "@prisma/client";
 import { FastifyPluginAsync } from "fastify/types/plugin";
 
-import { keydb } from "./connectivity/redis";
-import { prisma } from "./connectivity/prsima";
-import { UserFlags } from "./constants";
+import { connections, users, UserFlags } from "@puff-social/commons";
+import { keydb } from "@puff-social/commons/dist/connectivity/keydb";
+
+import { prisma } from "./connectivity/prisma";
 
 declare module "fastify" {
   interface FastifyRequest {

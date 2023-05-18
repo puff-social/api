@@ -2,7 +2,20 @@ import { z } from "zod";
 import { createDecipheriv, createHash } from "crypto";
 
 import { env } from "./env";
-import { ProductModelMap } from "./constants";
+import { puffco } from "@puff-social/commons";
+const { ProductModels } = puffco;
+
+export const loginValidation = z.object({
+  email: z.string(),
+  password: z.string(),
+});
+
+export const registerValidation = z.object({
+  username: z.string().max(32),
+  display_name: z.string().max(32).optional(),
+  email: z.string(),
+  password: z.string(),
+});
 
 export const feedbackValidation = z.object({
   message: z.string().max(1024),
@@ -25,7 +38,7 @@ export const trackingValidation = z.object({
     name: z.string().max(32),
     totalDabs: z.number(),
     dabsPerDay: z.number(),
-    model: z.enum(ProductModelMap),
+    model: z.enum(ProductModels),
     firmware: z.string(),
     hardware: z.number(),
     gitHash: z.string().max(7),
@@ -53,7 +66,7 @@ export const diagValidation = z.object({
     .optional(),
   device_parameters: z.object({
     name: z.string(),
-    model: z.enum(ProductModelMap),
+    model: z.enum(ProductModels),
     firmware: z.string(),
     hash: z.string().max(7).optional(),
     uptime: z.number().optional(),
