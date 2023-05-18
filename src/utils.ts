@@ -11,7 +11,11 @@ export const loginValidation = z.object({
 });
 
 export const registerValidation = z.object({
-  username: z.string().max(32),
+  username: z
+    .string()
+    .max(32)
+    .min(3)
+    .regex(/^(?![-.])(?!.*[-.]{2})[a-zA-Z0-9.-]+(?<![-.])$/gm),
   display_name: z.string().max(32).optional(),
   email: z.string(),
   password: z.string(),
