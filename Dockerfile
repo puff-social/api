@@ -18,6 +18,8 @@ FROM node:18
 
 RUN yarn global add pnpm
 
+LABEL org.opencontainers.image.source=https://github.com/puff-social/api
+
 WORKDIR /app
 
 COPY --from=builder /app/node_modules node_modules
