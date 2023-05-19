@@ -26,7 +26,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:latest,ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository }}:latest,ghcr.io/${{ github.repository }}:${{ github.sha }}
           build-args: |
             NPM_CONFIG_USERCONFIG=.npmrc.ci
             NPM_TOKEN=${{ secrets.GHCR_TOKEN }}
@@ -36,7 +36,7 @@ jobs:
         uses: danielr1996/kubectl-action@1.0.0
         with:
           kubeconfig: ${{ secrets.KUBECONFIG }}
-          args: set image --record deployment/puffsocial-api app=ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${{ github.sha }}
+          args: set image --record deployment/puffsocial-api app=ghcr.io/${{ github.repository }}:${{ github.sha }}
 
       - name: Verify deployment
         uses: danielr1996/kubectl-action@1.0.0
