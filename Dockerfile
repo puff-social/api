@@ -1,7 +1,10 @@
 FROM node:18 AS builder
 
+ARG NPM_CONFIG_USERCONFIG
+ARG NPM_TOKEN
+
 WORKDIR /app
-COPY package*.json pnpm-lock.yaml prisma ./
+COPY .npmrc.ci package*.json pnpm-lock.yaml prisma ./
 
 RUN yarn global add pnpm
 RUN pnpm install
