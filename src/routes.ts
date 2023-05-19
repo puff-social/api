@@ -20,7 +20,7 @@ import {
   userUpdateValidation,
   verifyRequest,
 } from "./utils";
-import { getDevicesRoute } from "./methods/devices";
+import { getUsersRoute } from "./methods/users";
 import { fetchUser, login as puffcoLogin } from "./helpers/puffco";
 import { hash, verify } from "argon2";
 import { prisma } from "./connectivity/prisma";
@@ -30,7 +30,7 @@ export function InternalRoutes(
   opts: FastifyPluginOptions,
   next: () => void
 ) {
-  server.get("/devices", getDevicesRoute);
+  server.get("/users", getUsersRoute);
 
   server.get("/verify", async (req, res) => {
     const authorization = req.headers.authorization;
@@ -66,7 +66,7 @@ export function AdministrativeRoutes(
 ) {
   server.register(AuthMiddleware, { required: true, admin: true });
 
-  server.get("/devices", getDevicesRoute);
+  server.get("/users", getUsersRoute);
 
   next();
 }
