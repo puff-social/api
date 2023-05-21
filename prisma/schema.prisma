@@ -14,17 +14,19 @@ model feedback {
 }
 
 model users {
-  id           String        @id
-  name         String
-  display_name String?
-  image        String?
-  banner       String?
-  flags        Int           @default(0)
-  bio          String?
-  accounts     accounts[]
-  connections  connections[]
-  devices      devices[]
-  sessions     sessions[]
+  id                    String                  @id
+  name                  String
+  display_name          String?
+  image                 String?
+  banner                String?
+  flags                 Int                     @default(0)
+  bio                   String?
+  location              String?
+  accounts              accounts[]
+  connections           connections[]
+  devices               devices[]
+  discord_subscriptions discord_subscriptions[]
+  sessions              sessions[]
 }
 
 model diagnostics {
@@ -120,4 +122,24 @@ model sessions {
   accounts      accounts?    @relation(fields: [account_id], references: [id], onDelete: Cascade)
   connections   connections? @relation(fields: [connection_id], references: [id], onDelete: Cascade)
   users         users        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model discord_subscription_tiers {
+  id                    String                  @id
+  name                  String
+  role_id               String
+  discord_subscriptions discord_subscriptions[]
+}
+
+model discord_subscriptions {
+  user_id                    String
+  platform_id                String
+  subscription_id            String
+  subscribed_since           DateTime                   @default(now()) @db.Timestamptz(6)
+  active                     Boolean                    @default(true)
+  months_active              Int                        @default(1)
+  discord_subscription_tiers discord_subscription_tiers @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
+  users                      users                      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, subscription_id, platform_id])
 }

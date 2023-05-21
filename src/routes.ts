@@ -92,7 +92,10 @@ export function AuthedRoutes(
     "/user",
     async (
       req: FastifyRequest<{
-        Body: Pick<users, "display_name" | "image" | "banner" | "bio">;
+        Body: Pick<
+          users,
+          "display_name" | "image" | "banner" | "bio" | "location"
+        >;
       }>,
       res
     ) => {
