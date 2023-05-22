@@ -2,36 +2,40 @@ import { envsafe, port, str } from "envsafe";
 
 export const env = envsafe({
   PORT: port({
-    default: 8000
+    default: 8000,
   }),
   INT_PORT: port({
-    default: 8002
+    default: 8002,
+  }),
+  GATEWAY_HOST: str({
+    default: "http://puffsocial-gateway-beta:9002",
+    devDefault: "http://10.8.99.23:9002",
   }),
   METRICS_KEY: str({
-    desc: "Signing key for metrics data"
+    desc: "Signing key for metrics data",
   }),
   REDIS_URI: str({
-    desc: "Redis Server URI"
+    desc: "Redis Server URI",
   }),
   DISCORD_CLIENT_ID: str({
-    desc: "Discord OAuth Client ID"
+    desc: "Discord OAuth Client ID",
   }),
   DISCORD_CLIENT_SECRET: str({
-    desc: "Discord OAuth Client Secret"
+    desc: "Discord OAuth Client Secret",
   }),
   APPLICATION_HOST: str({
-    desc: "Application Host"
+    desc: "Application Host",
   }),
   MINIO_ENDPOINT: str({
-    desc: "Minio Endpoint"
+    desc: "Minio Endpoint",
   }),
   MINIO_ACCESS_KEY: str({
-    desc: "Minio access key"
+    desc: "Minio access key",
   }),
   MINIO_SECRET_KEY: str({
-    desc: "Minio secret key"
+    desc: "Minio secret key",
   }),
   MINIO_BUCKET: str({
-    default: 'puffcdn'
+    default: "puffcdn",
   }),
 });
