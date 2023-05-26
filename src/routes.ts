@@ -51,18 +51,22 @@ export function InternalRoutes(
     });
 
     let voice: { id: string; name: string } | undefined = undefined;
-    const discordConnection = user?.connections.find(
-      (conn) => conn.platform == "discord"
-    );
-    if (discordConnection) {
-      const voiceChannel = await keydb.get(
-        `discord/${discordConnection?.platform_id}/voice`
+    try {
+      const discordConnection = user?.connections.find(
+        (conn) => conn.platform == "discord"
       );
-      if (voiceChannel) {
-        const channel = await fetch(`${env.BOT_HOST}/channels/${voiceChannel}`);
-        if (channel.status == 200) voice = await channel.json();
+      if (discordConnection) {
+        const voiceChannel = await keydb.get(
+          `discord/${discordConnection?.platform_id}/voice`
+        );
+        if (voiceChannel) {
+          const channel = await fetch(
+            `${env.BOT_HOST}/channels/${voiceChannel}`
+          );
+          if (channel.status == 200) voice = await channel.json();
+        }
       }
-    }
+    } catch (error) {}
 
     delete (user as Partial<users>).connections;
 
