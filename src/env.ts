@@ -7,6 +7,10 @@ export const env = envsafe({
   INT_PORT: port({
     default: 8002,
   }),
+  BOT_HOST: str({
+    default: "http://puffsocial-bot:8000",
+    devDefault: "http://10.8.99.24:8000",
+  }),
   GATEWAY_HOST: str({
     default: "http://puffsocial-gateway-beta:9002",
     devDefault: "http://10.8.99.23:9002",

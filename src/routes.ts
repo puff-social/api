@@ -44,15 +44,33 @@ export function InternalRoutes(
 
     const user = await prisma.users.findFirst({
       where: { id: session.user_id },
+      include: { connections: true },
     });
     const connection = await prisma.connections.findFirst({
       where: { id: session.connection_id },
     });
 
+    let voice: { id: string; name: string } | undefined = undefined;
+    const discordConnection = user?.connections.find(
+      (conn) => conn.platform == "discord"
+    );
+    if (discordConnection) {
+      const voiceChannel = await keydb.get(
+        `discord/${discordConnection?.platform_id}/voice`
+      );
+      if (voiceChannel) {
+        const channel = await fetch(`${env.BOT_HOST}/channels/${voiceChannel}`);
+        if (channel.status == 200) voice = await channel.json();
+      }
+    }
+
+    delete (user as Partial<users>).connections;
+
     return res.status(200).send({
       valid: true,
       user,
       connection,
+      voice,
     });
   });
 
