@@ -127,7 +127,7 @@ export function AuthedRoutes(
       fetch(`${env.GATEWAY_HOST}/user/${req.user.id}/update`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(user),
+        body: JSON.stringify({ user }),
       }).catch(console.error);
 
       return res.status(200).send({
