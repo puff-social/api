@@ -543,47 +543,6 @@ export function Routes(
               },
             });
 
-            if (user.avatar != existingConnection.users.image) {
-              if (existingConnection.users.image)
-                await minio.send(
-                  new DeleteObjectCommand({
-                    Bucket: env.MINIO_BUCKET,
-                    Key: `avatars/${existingConnection.users.id}/${
-                      existingConnection.users.image
-                    }.${
-                      existingConnection.users.image.startsWith("a_")
-                        ? "gif"
-                        : "png"
-                    }`,
-                  })
-                );
-
-              const img = await fetch(
-                `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${
-                  user.avatar.startsWith("a_") ? "gif" : "png"
-                }?size=512`
-              ).then((r) => r.arrayBuffer());
-              const imgBuffer = Buffer.from(img);
-              const hash = user.avatar;
-              await minio.send(
-                new PutObjectCommand({
-                  Bucket: env.MINIO_BUCKET,
-                  Key: `avatars/${existingConnection.users.id}/${hash}.${
-                    hash.startsWith("a_") ? "gif" : "png"
-                  }`,
-                  Body: imgBuffer,
-                  ContentType: "image/png",
-                })
-              );
-
-              await prisma.users.update({
-                where: { id: existingConnection.users.id },
-                data: { image: hash },
-              });
-
-              existingConnection.users.image = hash;
-            }
-
             return res.status(200).send({
               success: true,
               data: {
