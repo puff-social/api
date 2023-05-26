@@ -556,30 +556,34 @@ export function Routes(
           const id = pika.gen("user");
           const connection_id = pika.gen("connection");
 
-          const img = await fetch(
-            `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${
-              user.avatar.startsWith("a_") ? "gif" : "png"
-            }?size=512`
-          ).then((r) => r.arrayBuffer());
-          const imgBuffer = Buffer.from(img);
-          const hash = user.avatar;
-          await minio.send(
-            new PutObjectCommand({
-              Bucket: env.MINIO_BUCKET,
-              Key: `avatars/${id}/${hash}.${
-                hash.startsWith("a_") ? "gif" : "png"
-              }`,
-              Body: imgBuffer,
-              ContentType: "image/png",
-            })
-          );
+          let image: string | undefined = undefined;
+          if (user.avatar) {
+            const img = await fetch(
+              `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${
+                user.avatar.startsWith("a_") ? "gif" : "png"
+              }?size=512`
+            ).then((r) => r.arrayBuffer());
+            const imgBuffer = Buffer.from(img);
+            const hash = user.avatar;
+            await minio.send(
+              new PutObjectCommand({
+                Bucket: env.MINIO_BUCKET,
+                Key: `avatars/${id}/${hash}.${
+                  hash.startsWith("a_") ? "gif" : "png"
+                }`,
+                Body: imgBuffer,
+                ContentType: "image/png",
+              })
+            );
+            image = hash;
+          }
 
           await prisma.users.create({
             data: {
               id,
               name: user.username,
               display_name: user.username,
-              image: hash,
+              image,
             },
           });
 
