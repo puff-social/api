@@ -110,7 +110,7 @@ export function AuthedRoutes(
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(user),
-      }).catch(() => {});
+      }).catch(console.error);
 
       return res.status(200).send({
         success: true,
