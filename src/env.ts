@@ -12,7 +12,7 @@ export const env = envsafe({
     devDefault: "http://10.8.99.24:8000",
   }),
   GATEWAY_HOST: str({
-    default: "http://puffsocial-gateway-beta:9002",
+    default: "http://puffsocial-gateway:9002",
     devDefault: "http://10.8.99.23:9002",
   }),
   METRICS_KEY: str({
