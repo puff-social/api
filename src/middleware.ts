@@ -33,35 +33,34 @@ const middlewareCallback: FastifyPluginAsync<AuthOptions> = async function (
       user_id: string;
       connection_id: string;
     };
-    if (!session && options.required)
+    if ((!session || Object.keys(session).length == 0) && options.required)
       return res
         .status(403)
         .send({ error: true, code: "invalid_authentication" });
 
-    if (session) {
-      const user = await prisma.users.findFirst({
-        where: { id: session.user_id },
-      });
-      if (!user && options.required)
-        return res
-          .status(403)
-          .send({ error: true, code: "invalid_authentication" });
-      if (user) req.user = user;
+    const user = await prisma.users.findFirst({
+      where: { id: session.user_id },
+    });
+    if (!user && options.required)
+      return res
+        .status(403)
+        .send({ error: true, code: "invalid_authentication" });
+    if (user) req.user = user;
 
-      const connnection = await prisma.connections.findFirst({
-        where: { id: session.connection_id },
-      });
-      if (!user && options.required)
-        return res
-          .status(403)
-          .send({ error: true, code: "invalid_authentication" });
-      if (connnection) req.linkedConnection = connnection;
+    if (user && options.required && (user?.flags || 0) & UserFlags.suspended)
+      return res.status(403).send({ error: true, code: "user_suspended" });
 
-      if (options.admin && !((user?.flags || 0) & UserFlags.admin))
-        return res
-          .status(401)
-          .send({ error: true, code: "invalid_permissions" });
-    }
+    const connnection = await prisma.connections.findFirst({
+      where: { id: session.connection_id },
+    });
+    if (!user && options.required)
+      return res
+        .status(403)
+        .send({ error: true, code: "invalid_authentication" });
+    if (connnection) req.linkedConnection = connnection;
+
+    if (options.admin && !((user?.flags || 0) & UserFlags.admin))
+      return res.status(401).send({ error: true, code: "invalid_permissions" });
   });
 };
 

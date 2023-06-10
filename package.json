@@ -22,7 +22,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.301.0",
     "@fastify/cors": "^8.2.1",
-    "@puff-social/commons": "^1.0.12",
+    "@prisma/client": "4.14.1",
+    "@puff-social/commons": "^1.0.14",
     "argon2": "^0.30.3",
     "byte-data": "^19.0.1",
     "envsafe": "^2.0.3",
