@@ -23,6 +23,7 @@ const middlewareCallback: FastifyPluginAsync<AuthOptions> = async function (
   options
 ) {
   server.addHook("preParsing", async (req, res) => {
+    const url = new URL(req.url, "http://localhost");
     const authorization = req.headers.authorization;
     if (!authorization && options.required)
       return res
@@ -47,7 +48,12 @@ const middlewareCallback: FastifyPluginAsync<AuthOptions> = async function (
         .send({ error: true, code: "invalid_authentication" });
     if (user) req.user = user;
 
-    if (user && options.required && (user?.flags || 0) & UserFlags.suspended)
+    if (
+      user &&
+      options.required &&
+      (user?.flags || 0) & UserFlags.suspended &&
+      !url.pathname.endsWith("/user")
+    )
       return res.status(403).send({ error: true, code: "user_suspended" });
 
     const connnection = await prisma.connections.findFirst({
