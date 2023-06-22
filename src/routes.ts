@@ -24,6 +24,8 @@ import { getUsersRoute } from "./methods/users";
 import { fetchUser, login as puffcoLogin } from "./helpers/puffco";
 import { hash, verify } from "argon2";
 import { prisma } from "./connectivity/prisma";
+import { getDevicesRoute } from "./methods/devices";
+import { getOtaFirmware } from "./methods/firmware";
 
 export function InternalRoutes(
   server: FastifyInstance,
@@ -31,6 +33,7 @@ export function InternalRoutes(
   next: () => void
 ) {
   server.get("/users", getUsersRoute);
+  server.get("/devices", getDevicesRoute);
 
   server.get("/verify", async (req, res) => {
     const authorization = req.headers.authorization;
@@ -208,6 +211,8 @@ export function Routes(
       return res.status(200).send({ success: true, data: { leaderboards } });
     }
   );
+
+  server.get("/fw/peak/:serial", getOtaFirmware);
 
   server.post("/track", async (req, res) => {
     if (!req.headers["x-signature"])

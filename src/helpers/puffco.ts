@@ -13,7 +13,7 @@ export async function getOtaLatest(serial?: string) {
     {
       headers: {
         "user-agent": "puff.social/1.0.0",
-        "x-app-version": "1.7.5",
+        "x-app-version": "2.2.0",
       },
     }
   );
@@ -35,7 +35,7 @@ export async function login(email: string, password: string) {
     headers: {
       "content-type": "application/json",
       "user-agent": "puff.social/1.0.0",
-      "x-app-version": "1.7.5",
+      "x-app-version": "2.2.0",
     },
   });
 
@@ -91,7 +91,7 @@ export async function fetchUser(token: string) {
     headers: {
       authorization: `Bearer ${token}`,
       "user-agent": "puff.social/1.0.0",
-      "x-app-version": "1.7.5",
+      "x-app-version": "2.2.0",
     },
   });
 
@@ -108,7 +108,7 @@ export async function heatProfiles(token: string) {
     headers: {
       authorization: `Bearer ${token}`,
       "user-agent": "puff.social/1.0.0",
-      "x-app-version": "1.7.5",
+      "x-app-version": "2.2.0",
     },
   });
 
