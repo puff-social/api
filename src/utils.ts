@@ -54,6 +54,8 @@ const profileValidation = z.object({
   name: z.string(),
   temp: z.number(),
   time: z.string(),
+  intensity: z.number().optional(),
+  color: z.string().optional(),
 });
 
 export const diagValidation = z.object({
