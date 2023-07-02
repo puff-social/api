@@ -134,6 +134,5 @@ export function normalizeUsername(username: string): string {
     .replace(/\s+/g, "-")
     .replace(/[^\w-.]+/g, "")
     .replace(/\.{2,}/g, ".")
-    .replace(/-{2,}/g, "-")
-    .replace(/--+/g, "-");
+    .replace(/-{2,}/g, "-");
 }
