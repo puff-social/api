@@ -15,7 +15,7 @@ export const registerValidation = z.object({
     .string()
     .max(32)
     .min(3)
-    .regex(/^(?![-.])(?!.*[-.]{2})[a-zA-Z0-9.-]+(?<![-.])$/gm),
+    .regex(/^(?![-.])(?!.*[-.]{2})[a-z0-9.-]+(?<![-.])$/gm),
   display_name: z.string().max(32).optional(),
   email: z.string(),
   password: z.string(),
@@ -132,6 +132,8 @@ export function normalizeUsername(username: string): string {
     .toLowerCase()
     .trim()
     .replace(/\s+/g, "-")
-    .replace(/[^\w-]+/g, "")
+    .replace(/[^\w-.]+/g, "")
+    .replace(/\.{2,}/g, ".")
+    .replace(/-{2,}/g, "-")
     .replace(/--+/g, "-");
 }
