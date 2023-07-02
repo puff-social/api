@@ -13,7 +13,7 @@ export async function getOtaLatest(serial?: string) {
     {
       headers: {
         "user-agent": "puff.social/1.0.0",
-        "x-app-version": "2.2.0",
+        "x-app-version": "2.2.2",
       },
     }
   );
@@ -35,7 +35,7 @@ export async function login(email: string, password: string) {
     headers: {
       "content-type": "application/json",
       "user-agent": "puff.social/1.0.0",
-      "x-app-version": "2.2.0",
+      "x-app-version": "2.2.2",
     },
   });
 
@@ -91,7 +91,44 @@ export async function fetchUser(token: string) {
     headers: {
       authorization: `Bearer ${token}`,
       "user-agent": "puff.social/1.0.0",
-      "x-app-version": "2.2.0",
+      "x-app-version": "2.2.2",
+    },
+  });
+
+  if (req.status != 200)
+    throw { code: "failed_to_get_user", status: req.status };
+
+  const json: PuffcoUser = await req.json();
+
+  return json;
+}
+
+export async function createDevice(token: string, device: any) {
+  const req = await fetch(`https://api.puffco.app/api/peak-devices`, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${token}`,
+      "user-agent": "puff.social/1.0.0",
+      "x-app-version": "2.2.2",
+    },
+    body: JSON.stringify(device),
+  });
+
+  if (req.status != 200)
+    throw { code: "failed_to_get_user", status: req.status };
+
+  const json: PuffcoUser = await req.json();
+
+  return json;
+}
+
+export async function deleteDevice(token: string, serial: string) {
+  const req = await fetch(`https://api.puffco.app/api/peak-devices/${serial}`, {
+    method: "DELETE",
+    headers: {
+      authorization: `Bearer ${token}`,
+      "user-agent": "puff.social/1.0.0",
+      "x-app-version": "2.2.2",
     },
   });
 
@@ -108,7 +145,7 @@ export async function heatProfiles(token: string) {
     headers: {
       authorization: `Bearer ${token}`,
       "user-agent": "puff.social/1.0.0",
-      "x-app-version": "2.2.0",
+      "x-app-version": "2.2.2",
     },
   });
 

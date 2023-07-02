@@ -587,7 +587,7 @@ export function Routes(
             data: {
               id,
               name: user.username,
-              display_name: user.username,
+              display_name: user.global_name || user.username,
               image,
             },
           });
@@ -623,7 +623,12 @@ export function Routes(
           return res.status(200).send({
             success: true,
             data: {
-              user: { id, name: user.username, image: hash },
+              user: {
+                id,
+                name: user.username,
+                display_name: user.global_name || user.username,
+                image: hash,
+              },
               connection: {
                 id: connection_id,
                 platform: "discord",

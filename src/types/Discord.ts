@@ -6,10 +6,10 @@ export interface DiscordTokens {
   scope: string;
 }
 
-
 export interface DiscordUser {
   id: string;
   username: string;
+  global_name: string;
   avatar: string;
   discriminator: string;
 }
