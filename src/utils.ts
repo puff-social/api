@@ -124,3 +124,14 @@ export function macAddressToUint8Array(macAddress: string): Uint8Array {
 
   return reversedArray;
 }
+
+export function normalizeUsername(username: string): string {
+  return username
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "")
+    .replace(/--+/g, "-");
+}

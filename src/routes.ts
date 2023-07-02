@@ -15,6 +15,7 @@ import {
   feedbackValidation,
   loginValidation,
   registerValidation,
+  normalizeUsername,
   sanitize,
   trackingValidation,
   userUpdateValidation,
@@ -586,7 +587,7 @@ export function Routes(
           await prisma.users.create({
             data: {
               id,
-              name: user.username,
+              name: normalizeUsername(user.username),
               display_name: user.global_name || user.username,
               image,
             },
@@ -625,7 +626,7 @@ export function Routes(
             data: {
               user: {
                 id,
-                name: user.username,
+                name: normalizeUsername(user.username),
                 display_name: user.global_name || user.username,
                 image: hash,
               },
