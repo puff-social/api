@@ -110,8 +110,8 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
           firmware: validate.device.firmware,
           hardware: validate.device.hardware,
           git_hash: validate.device.gitHash,
-          last_dab: validate.device.lastDab
-            ? new Date(validate.device.lastDab)
+          last_dab: validate.device.lastDabAt
+            ? new Date(validate.device.lastDabAt)
             : undefined,
           dob: new Date(validate.device.dob * 1000),
           last_active: new Date().toISOString(),
@@ -135,8 +135,8 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
           firmware: validate.device.firmware,
           hardware: validate.device.hardware,
           git_hash: validate.device.gitHash,
-          last_dab: validate.device.lastDab
-            ? new Date(validate.device.lastDab)
+          last_dab: validate.device.lastDabAt
+            ? new Date(validate.device.lastDabAt)
             : undefined,
           dob: new Date(validate.device.dob * 1000),
           last_active: new Date().toISOString(),
