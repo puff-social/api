@@ -47,6 +47,7 @@ export const trackingValidation = z.object({
     firmware: z.string(),
     hardware: z.number(),
     gitHash: z.string().max(7),
+    lastDab: z.string().optional(),
   }),
 });
 

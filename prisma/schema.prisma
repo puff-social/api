@@ -87,8 +87,9 @@ model devices {
   last_ip            String?
   user_id            String?
   profiles           Json?
+  last_dab           DateTime?           @db.Timestamp(6)
   device_leaderboard device_leaderboard?
-  users              users?              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  users              users?              @relation(fields: [user_id], references: [id])
 }
 
 model accounts {
@@ -142,4 +143,21 @@ model discord_subscriptions {
   users                      users                      @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@id([user_id, subscription_id, platform_id])
+}
+
+model discord_users {
+  id            String  @id
+  xp            Int     @default(0)
+  messages      Int     @default(0)
+  vc_time       Int     @default(0)
+  level         Int     @default(dbgenerated("calculate_level(xp)"))
+  vc_time_alone Int     @default(0)
+  invites       Int     @default(0)
+  birthday      String?
+}
+
+model firmware_watches {
+  id     String @id
+  serial String @unique(map: "firmware_serial_unq")
+  user   String
 }
