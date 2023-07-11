@@ -20,8 +20,8 @@ export async function trackDiags(req: FastifyRequest, res: FastifyReply) {
   const validate = await diagValidation.parseAsync(body);
 
   const id = pika.gen("diagnostics");
-  const ip = (req.headers["cf-connecting-ip"] ||
-    req.socket.remoteAddress ||
+  const ip = (req.headers["cf-connecting-ip"] ??
+    req.socket.remoteAddress ??
     "0.0.0.0") as string;
   const userAgent = req.headers["user-agent"];
 
@@ -45,9 +45,9 @@ export async function trackDiags(req: FastifyRequest, res: FastifyReply) {
     await prisma.diagnostics.create({
       data: {
         id,
-        device_name: validate.device_parameters.name as string,
+        device_name: validate.device_parameters.name,
         device_model: validate.device_parameters.model,
-        device_firmware: validate.device_parameters.firmware as string,
+        device_firmware: validate.device_parameters.firmware,
         device_git_hash: validate.device_parameters.hash,
         device_uptime: validate.device_parameters.uptime,
         device_utc_time: validate.device_parameters.utc,
@@ -67,7 +67,7 @@ export async function trackDiags(req: FastifyRequest, res: FastifyReply) {
         device_profiles: validate.device_profiles,
         device_services: validate.device_services,
         session_id: validate.session_id,
-        user_agent: userAgent || "unknown",
+        user_agent: userAgent ?? "unknown",
         ip,
       },
     });
@@ -89,8 +89,8 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
   try {
     const validate = await trackingValidation.parseAsync(body);
 
-    const ip = (req.headers["cf-connecting-ip"] ||
-      req.socket.remoteAddress ||
+    const ip = (req.headers["cf-connecting-ip"] ??
+      req.socket.remoteAddress ??
       "0.0.0.0") as string;
 
     const date = new Date(validate.device.dob * 1000);

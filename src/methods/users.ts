@@ -10,8 +10,22 @@ export async function getUsersRoute(
   req: FastifyRequest<{ Querystring: { limit?: string } }>,
   res: FastifyReply
 ) {
+  const currentDate = new Date();
   let users = await prisma.users.findMany({
-    where: { NOT: { devices: { none: {} } } },
+    where: {
+      NOT: { devices: { none: {} } },
+      devices: {
+        every: {
+          last_active: {
+            gte: new Date(
+              currentDate.getFullYear(),
+              currentDate.getMonth(),
+              currentDate.getDate() - 28
+            ),
+          },
+        },
+      },
+    },
     include: {
       devices: true,
       accounts: true,
