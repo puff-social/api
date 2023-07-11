@@ -15,7 +15,7 @@ export async function getUsersRoute(
     where: {
       NOT: { devices: { none: {} } },
       devices: {
-        every: {
+        some: {
           last_active: {
             gte: new Date(
               currentDate.getFullYear(),
