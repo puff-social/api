@@ -39,34 +39,38 @@ const middlewareCallback: FastifyPluginAsync<AuthOptions> = async function (
         .status(403)
         .send({ error: true, code: "invalid_authentication" });
 
-    const user = await prisma.users.findFirst({
-      where: { id: session.user_id },
-    });
-    if (!user && options.required)
-      return res
-        .status(403)
-        .send({ error: true, code: "invalid_authentication" });
-    if (user) req.user = user;
+    if (session.user_id) {
+      const user = await prisma.users.findFirst({
+        where: { id: session.user_id },
+      });
+      if (!user && options.required)
+        return res
+          .status(403)
+          .send({ error: true, code: "invalid_authentication" });
+      if (user) req.user = user;
 
-    if (
-      user &&
-      options.required &&
-      (user?.flags || 0) & UserFlags.suspended &&
-      !url.pathname.endsWith("/user")
-    )
-      return res.status(403).send({ error: true, code: "user_suspended" });
+      if (
+        user &&
+        options.required &&
+        (user?.flags || 0) & UserFlags.suspended &&
+        !url.pathname.endsWith("/user")
+      )
+        return res.status(403).send({ error: true, code: "user_suspended" });
 
-    const connnection = await prisma.connections.findFirst({
-      where: { id: session.connection_id },
-    });
-    if (!user && options.required)
-      return res
-        .status(403)
-        .send({ error: true, code: "invalid_authentication" });
-    if (connnection) req.linkedConnection = connnection;
+      const connnection = await prisma.connections.findFirst({
+        where: { id: session.connection_id },
+      });
+      if (!user && options.required)
+        return res
+          .status(403)
+          .send({ error: true, code: "invalid_authentication" });
+      if (connnection) req.linkedConnection = connnection;
 
-    if (options.admin && !((user?.flags || 0) & UserFlags.admin))
-      return res.status(401).send({ error: true, code: "invalid_permissions" });
+      if (options.admin && !((user?.flags || 0) & UserFlags.admin))
+        return res
+          .status(401)
+          .send({ error: true, code: "invalid_permissions" });
+    }
   });
 };
 
