@@ -68,11 +68,13 @@ export async function trackLog(
     | DeviceDabsUpdate
 ) {
   try {
-    await fetch(`${env.DASH_API_HOST}/log?type=${type}&channel=${channel}`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(data),
-    }).then(console.log);
+    console.log(
+      await fetch(`${env.DASH_API_HOST}/log?type=${type}&channel=${channel}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(data),
+      }).then((r) => r.json())
+    );
   } catch (error) {
     console.error(error);
   }
