@@ -40,6 +40,7 @@ export const trackingValidation = z.object({
   device: z.object({
     dob: z.number(),
     mac,
+    serial: z.string().optional(),
     name: z.string().max(32),
     totalDabs: z.number(),
     dabsPerDay: z.number(),

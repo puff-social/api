@@ -138,6 +138,7 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
           dob: new Date(validate.device.dob * 1000),
           last_active: new Date().toISOString(),
           last_ip: ip,
+          serial_number: validate.device.serial,
           ...(req.user ? { user_id: req.user.id } : {}),
         },
         where: {
@@ -172,6 +173,7 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
           dob: new Date(validate.device.dob * 1000),
           last_active: new Date().toISOString(),
           last_ip: ip,
+          serial_number: validate.device.serial,
           ...(req.user ? { user_id: req.user.id } : {}),
         },
       });
