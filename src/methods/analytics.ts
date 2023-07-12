@@ -152,7 +152,7 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
         name: validate.device.name,
         mac: validate.device.mac,
         firmware: validate.device.firmware,
-        serial_number: "N/A",
+        serial_number: validate.device.serial,
         device_model: validate.device.model,
         dabs: validate.device.totalDabs,
       });
