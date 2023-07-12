@@ -15,8 +15,8 @@ export const env = envsafe({
     default: "http://puffsocial-gateway:9002",
     devDefault: "http://10.8.99.23:9002",
   }),
-  DASH_HOST: str({
-    default: "http://puffsocial-int-api:8004",
+  DASH_API_HOST: str({
+    default: "http://puffsocial-int-api:9004",
     devDefault: "http://10.8.99.4:9004",
   }),
   METRICS_KEY: str({

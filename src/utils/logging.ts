@@ -68,7 +68,7 @@ export async function trackLog(
     | DeviceDabsUpdate
 ) {
   try {
-    await fetch(`${env.DASH_HOST}/log?type=${type}&channel=${channel}`, {
+    await fetch(`${env.DASH_API_HOST}/log?type=${type}&channel=${channel}`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(data),
