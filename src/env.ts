@@ -16,8 +16,8 @@ export const env = envsafe({
     devDefault: "http://10.8.99.23:9002",
   }),
   DASH_API_HOST: str({
-    default: "http://puffsocial-int-api:9004",
-    devDefault: "http://10.8.99.4:9004",
+    default: "http://puffsocial-int-api:9006",
+    devDefault: "http://10.8.99.4:9006",
   }),
   METRICS_KEY: str({
     desc: "Signing key for metrics data",
