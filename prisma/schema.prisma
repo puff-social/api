@@ -89,6 +89,7 @@ model devices {
   profiles           Json?
   last_dab           DateTime?           @db.Timestamp(6)
   device_leaderboard device_leaderboard?
+  device_logs        device_logs[]
   users              users?              @relation(fields: [user_id], references: [id])
 }
 
@@ -160,4 +161,18 @@ model firmware_watches {
   id     String @id
   serial String @unique(map: "firmware_serial_unq")
   user   String
+}
+
+model device_logs {
+  id             String   @id
+  device_id      String
+  log_id         Int
+  type           Int
+  timestamp      DateTime @db.Timestamp(6)
+  real_timestamp DateTime @db.Timestamp(6)
+  recorded_on    DateTime @default(now()) @db.Timestamp(6)
+  data           Json?
+  devices        devices  @relation(fields: [device_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([device_id, type, timestamp, real_timestamp], map: "device_unq_time_type")
 }

@@ -9,6 +9,7 @@ import {
   trackingValidation,
   sanitize,
 } from "../utils";
+import { LogTypes, Owner, trackLog } from "../utils/logging";
 
 export async function trackDiags(req: FastifyRequest, res: FastifyReply) {
   if (!req.headers["x-signature"])
@@ -99,8 +100,29 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
 
     const existing = await prisma.devices.findFirst({
       where: { mac: validate.device.mac },
+      include: {
+        users: { select: { id: true, name: true, display_name: true } },
+      },
     });
     if (existing) {
+      if (existing.dabs != validate.device.totalDabs)
+        trackLog(LogTypes.DeviceDabsUpdate, {
+          id: existing.id,
+          name: existing.name,
+          dabs: validate.device.totalDabs,
+        });
+      if (req.user && existing.users && req.user.id != existing.user_id)
+        trackLog(LogTypes.DeviceNewOwner, {
+          id: existing.id,
+          name: existing.name,
+          new_owner: {
+            id: req.user.id,
+            name: req.user.name,
+            display_name: req.user.display_name,
+          },
+          old_owner: existing.users as Owner,
+        });
+
       await prisma.devices.update({
         data: {
           name: validate.device.name,
@@ -124,6 +146,15 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
       });
     } else {
       const id = pika.gen("device");
+      trackLog(LogTypes.NewDevice, {
+        id,
+        name: validate.device.name,
+        mac: validate.device.mac,
+        firmware: validate.device.firmware,
+        serial_number: "N/A",
+        device_model: validate.device.model,
+        dabs: validate.device.totalDabs,
+      });
       await prisma.devices.create({
         data: {
           id,

@@ -7,6 +7,8 @@ import { FastifyRequest } from "fastify";
 import { prisma } from "../../connectivity/prisma";
 import { fetchUser, login } from "../../helpers/puffco";
 import { sanitize } from "../../utils";
+import { Owner } from "@aws-sdk/client-s3";
+import { trackLog, LogTypes } from "../../utils/logging";
 
 export async function puffcoLogin(
   req: FastifyRequest<{ Body: { email: string; password: string } }>,
@@ -78,6 +80,13 @@ export async function puffcoLogin(
 
   const id = pika.gen("user");
   const connection_id = pika.gen("connection");
+
+  trackLog(LogTypes.NewUser, {
+    id,
+    name: puffcoUser.username,
+    display_name: puffcoUser.username,
+    auth_type: "puffco",
+  });
 
   await prisma.users.create({
     data: {

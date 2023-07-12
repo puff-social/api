@@ -5,6 +5,7 @@ import { ZodError } from "zod";
 
 import { prisma } from "../connectivity/prisma";
 import { verifyRequest, feedbackValidation } from "../utils";
+import { LogTypes, trackLog } from "../utils/logging";
 
 export async function userFeedback(req: FastifyRequest, res: FastifyReply) {
   try {
@@ -27,6 +28,12 @@ export async function userFeedback(req: FastifyRequest, res: FastifyReply) {
         message: validate.message,
         ip,
       },
+    });
+
+    trackLog(LogTypes.SiteFeedback, {
+      id,
+      message: validate.message,
+      ip,
     });
 
     return res.status(204).send();

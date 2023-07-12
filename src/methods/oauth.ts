@@ -11,6 +11,7 @@ import { normalizeUsername } from "../utils";
 import { minio } from "../connectivity/minio";
 import { prisma } from "../connectivity/prisma";
 import { exchangeDiscordCode, fetchDiscordUser } from "../helpers/discord";
+import { LogTypes, trackLog } from "../utils/logging";
 
 export async function getOAuthURL(
   req: FastifyRequest<{ Params: { platform: string } }>,
@@ -139,6 +140,13 @@ export async function callbackOAuth(
           display_name: user.global_name || user.username,
           image,
         },
+      });
+
+      trackLog(LogTypes.NewUser, {
+        id,
+        name: normalizeUsername(user.username),
+        display_name: user.global_name || user.username,
+        auth_type: "discord",
       });
 
       await prisma.connections.create({

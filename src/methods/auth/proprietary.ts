@@ -6,6 +6,7 @@ import { FastifyRequest } from "fastify";
 
 import { prisma } from "../../connectivity/prisma";
 import { loginValidation, registerValidation } from "../../utils";
+import { LogTypes, trackLog } from "../../utils/logging";
 
 export async function createAccount(req: FastifyRequest, res) {
   const { username, display_name, email, password } =
@@ -36,6 +37,13 @@ export async function createAccount(req: FastifyRequest, res) {
 
   const id = pika.gen("user");
   const account_id = pika.gen("account");
+
+  trackLog(LogTypes.NewUser, {
+    id,
+    name: username,
+    display_name,
+    auth_type: "first",
+  });
 
   await prisma.users.create({
     data: {
