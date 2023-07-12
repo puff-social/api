@@ -72,6 +72,8 @@ export async function trackLog(
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(data),
-    });
-  } catch (error) {}
+    }).then(console.log);
+  } catch (error) {
+    console.error(error);
+  }
 }
