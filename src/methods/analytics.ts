@@ -41,6 +41,11 @@ export async function trackDiags(req: FastifyRequest, res: FastifyReply) {
           mac: validate.device_parameters.mac,
         },
       });
+
+      trackLog(LogTypes.DeviceConnection, "devices", {
+        id: device.id,
+        name: device.name,
+      });
     }
 
     await prisma.diagnostics.create({
