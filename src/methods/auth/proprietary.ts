@@ -38,7 +38,7 @@ export async function createAccount(req: FastifyRequest, res) {
   const id = pika.gen("user");
   const account_id = pika.gen("account");
 
-  trackLog(LogTypes.NewUser, {
+  trackLog(LogTypes.NewUser, "users", {
     id,
     name: username,
     display_name,

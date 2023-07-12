@@ -81,7 +81,7 @@ export async function puffcoLogin(
   const id = pika.gen("user");
   const connection_id = pika.gen("connection");
 
-  trackLog(LogTypes.NewUser, {
+  trackLog(LogTypes.NewUser, "users", {
     id,
     name: puffcoUser.username,
     display_name: puffcoUser.username,

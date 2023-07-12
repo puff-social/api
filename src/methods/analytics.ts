@@ -106,13 +106,13 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
     });
     if (existing) {
       if (existing.dabs != validate.device.totalDabs)
-        trackLog(LogTypes.DeviceDabsUpdate, {
+        trackLog(LogTypes.DeviceDabsUpdate, "devices", {
           id: existing.id,
           name: existing.name,
           dabs: validate.device.totalDabs,
         });
       if (req.user && existing.users && req.user.id != existing.user_id)
-        trackLog(LogTypes.DeviceNewOwner, {
+        trackLog(LogTypes.DeviceNewOwner, "devices", {
           id: existing.id,
           name: existing.name,
           new_owner: {
@@ -146,7 +146,7 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
       });
     } else {
       const id = pika.gen("device");
-      trackLog(LogTypes.NewDevice, {
+      trackLog(LogTypes.NewDevice, "devices", {
         id,
         name: validate.device.name,
         mac: validate.device.mac,

@@ -142,7 +142,7 @@ export async function callbackOAuth(
         },
       });
 
-      trackLog(LogTypes.NewUser, {
+      trackLog(LogTypes.NewUser, "users", {
         id,
         name: normalizeUsername(user.username),
         display_name: user.global_name || user.username,

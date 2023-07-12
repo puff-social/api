@@ -58,6 +58,7 @@ export interface DeviceDabsUpdate {
 
 export async function trackLog(
   type: LogTypes,
+  channel: string,
   data:
     | NewUser
     | NewDevice
@@ -67,7 +68,7 @@ export async function trackLog(
     | DeviceDabsUpdate
 ) {
   try {
-    await fetch(`${env.DASH_HOST}/log`, {
+    await fetch(`${env.DASH_HOST}/log?type=${type}&channel=${channel}`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(data),

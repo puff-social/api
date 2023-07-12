@@ -30,7 +30,7 @@ export async function userFeedback(req: FastifyRequest, res: FastifyReply) {
       },
     });
 
-    trackLog(LogTypes.SiteFeedback, {
+    trackLog(LogTypes.SiteFeedback, "feedback", {
       id,
       message: validate.message,
       ip,
