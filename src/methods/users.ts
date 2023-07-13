@@ -7,24 +7,26 @@ import { prisma } from "../connectivity/prisma";
 import { userUpdateValidation } from "../utils";
 
 export async function getUsersRoute(
-  req: FastifyRequest<{ Querystring: { limit?: string } }>,
+  req: FastifyRequest<{ Querystring: { limit?: string; all: boolean } }>,
   res: FastifyReply
 ) {
   const currentDate = new Date();
   let users = await prisma.users.findMany({
     where: {
       NOT: { devices: { none: {} } },
-      devices: {
-        some: {
-          last_active: {
-            gte: new Date(
-              currentDate.getFullYear(),
-              currentDate.getMonth(),
-              currentDate.getDate() - 28
-            ),
+      devices: req.query.all
+        ? undefined
+        : {
+            some: {
+              last_active: {
+                gte: new Date(
+                  currentDate.getFullYear(),
+                  currentDate.getMonth(),
+                  currentDate.getDate() - 28
+                ),
+              },
+            },
           },
-        },
-      },
     },
     include: {
       devices: true,
