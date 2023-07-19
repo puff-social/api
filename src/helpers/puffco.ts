@@ -1,3 +1,4 @@
+import { keydb } from "@puff-social/commons/dist/connectivity/keydb";
 import {
   AccountTokens,
   HeatProfile,
@@ -9,6 +10,17 @@ const BaseHeaders = {
   "user-agent": "puff.social/1.0.0",
   "x-app-version": "2.3.0",
 };
+
+async function pullCurrentAppVersion() {
+  const version = await keydb.hget("puffco/app/version", "version");
+  if (version && version != BaseHeaders["x-app-version"]) {
+    BaseHeaders["x-app-version"] = version;
+    console.log("API > Puffco app version changed", version);
+  }
+}
+
+pullCurrentAppVersion();
+setInterval(pullCurrentAppVersion, 30_000);
 
 export async function getOtaLatest(serial?: string) {
   const req = await fetch(
