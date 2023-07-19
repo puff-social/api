@@ -5,16 +5,18 @@ import {
   PuffcoUser,
 } from "../types/Puffco";
 
+const BaseHeaders = {
+  "user-agent": "puff.social/1.0.0",
+  "x-app-version": "2.3.0",
+};
+
 export async function getOtaLatest(serial?: string) {
   const req = await fetch(
     `https://api.puffco.app/api/ota/latest${
       serial ? `?serialNumber=${serial}` : ""
     }`,
     {
-      headers: {
-        "user-agent": "puff.social/1.0.0",
-        "x-app-version": "2.2.2",
-      },
+      headers: BaseHeaders,
     }
   );
 
@@ -34,8 +36,7 @@ export async function login(email: string, password: string) {
     body: JSON.stringify({ email, password }),
     headers: {
       "content-type": "application/json",
-      "user-agent": "puff.social/1.0.0",
-      "x-app-version": "2.2.2",
+      ...BaseHeaders,
     },
   });
 
@@ -90,8 +91,7 @@ export async function fetchUser(token: string) {
   const req = await fetch("https://api.puffco.app/api/users/me", {
     headers: {
       authorization: `Bearer ${token}`,
-      "user-agent": "puff.social/1.0.0",
-      "x-app-version": "2.2.2",
+      ...BaseHeaders,
     },
   });
 
@@ -108,8 +108,7 @@ export async function createDevice(token: string, device: any) {
     method: "POST",
     headers: {
       authorization: `Bearer ${token}`,
-      "user-agent": "puff.social/1.0.0",
-      "x-app-version": "2.2.2",
+      ...BaseHeaders,
     },
     body: JSON.stringify(device),
   });
@@ -127,8 +126,7 @@ export async function deleteDevice(token: string, serial: string) {
     method: "DELETE",
     headers: {
       authorization: `Bearer ${token}`,
-      "user-agent": "puff.social/1.0.0",
-      "x-app-version": "2.2.2",
+      ...BaseHeaders,
     },
   });
 
@@ -144,8 +142,7 @@ export async function heatProfiles(token: string) {
   const req = await fetch("https://api.puffco.app/api/users/me/heat-profiles", {
     headers: {
       authorization: `Bearer ${token}`,
-      "user-agent": "puff.social/1.0.0",
-      "x-app-version": "2.2.2",
+      ...BaseHeaders,
     },
   });
 

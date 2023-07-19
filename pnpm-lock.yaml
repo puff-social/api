@@ -4,7 +4,7 @@ specifiers:
   '@aws-sdk/client-s3': ^3.301.0
   '@fastify/cors': ^8.2.1
   '@prisma/client': 4.14.1
-  '@puff-social/commons': ^1.0.21
+  '@puff-social/commons': ^1.0.25
   '@types/jsonwebtoken': ^9.0.2
   '@types/node': ^18.15.3
   argon2: ^0.30.3
@@ -24,7 +24,7 @@ dependencies:
   '@aws-sdk/client-s3': 3.301.0
   '@fastify/cors': 8.2.1
   '@prisma/client': 4.14.1_prisma@4.14.1
-  '@puff-social/commons': 1.0.21_prisma@4.14.1
+  '@puff-social/commons': 1.0.25_prisma@4.14.1
   argon2: 0.30.3
   byte-data: 19.0.1
   envsafe: 2.0.3
@@ -1108,8 +1108,8 @@ packages:
     resolution: {integrity: sha512-APqFddPVHYmWNKqc+5J5SqrLFfOghKOLZxobmguDUacxOwdEutLsbXPVhNnpFDmuQWQFbXmrTTPoRrrF6B1MWA==}
     requiresBuild: true
 
-  /@puff-social/commons/1.0.21_prisma@4.14.1:
-    resolution: {integrity: sha512-LC0a4eu38CRyGIx4QRVPTM0tbLrUbX237o6H6YEy1vloLr6HMyngHrjedjJ7rEzeY9hCzJb5nPv9Rtlz57w5cA==, tarball: download/@puff-social/commons/1.0.21/855fe6a5291cbdb462e9ac7ef15a96f1930e427d}
+  /@puff-social/commons/1.0.25_prisma@4.14.1:
+    resolution: {integrity: sha512-UZk8LxzETCohgp2xV3Z1HiF2PphU89n/1qBwLqINB8qIdkUY0olVIruopOgIG5sgXNg6v4v1OckqpDjiQ2dAiQ==, tarball: download/@puff-social/commons/1.0.25/333a69fecaa2a8562187b7521ee2f98a541a42a3}
     dependencies:
       '@prisma/client': 4.14.0_prisma@4.14.1
       envsafe: 2.0.3

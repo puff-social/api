@@ -7,7 +7,6 @@ import { FastifyRequest } from "fastify";
 import { prisma } from "../../connectivity/prisma";
 import { fetchUser, login } from "../../helpers/puffco";
 import { sanitize } from "../../utils";
-import { Owner } from "@aws-sdk/client-s3";
 import { trackLog, LogTypes } from "../../utils/logging";
 
 export async function puffcoLogin(
