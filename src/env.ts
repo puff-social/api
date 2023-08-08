@@ -8,15 +8,15 @@ export const env = envsafe({
     default: 8002,
   }),
   BOT_HOST: str({
-    default: "http://puffsocial-bot:8000",
+    default: "http://bot:8000",
     devDefault: "http://10.8.99.24:8000",
   }),
   GATEWAY_HOST: str({
-    default: "http://puffsocial-gateway:9002",
+    default: "http://gateway:9002",
     devDefault: "http://10.8.99.23:9002",
   }),
   DASH_API_HOST: str({
-    default: "http://puffsocial-int-api:8006",
+    default: "http://int-api:8006",
     devDefault: "http://10.8.99.4:8006",
   }),
   METRICS_KEY: str({
