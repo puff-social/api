@@ -20,6 +20,14 @@ export async function exchangeDiscordCode(code: string, redirect_uri: string) {
   if (req.status != 200) throw { code: "invalid_token_request" };
 
   const json: DiscordTokens = await req.json();
+
+  if (env.DEBUG)
+    console.debug(
+      `API > Exchanged tokens for code : ${code}`,
+      json.access_token.substring(0, 10),
+      json.scope
+    );
+
   return json;
 }
 
@@ -30,8 +38,22 @@ export async function fetchDiscordUser(token: string) {
     },
   });
 
+  if (env.DEBUG)
+    console.debug(
+      `API > Discord user fetched : ${token.substring(0, 10)}`,
+      req.status,
+      req.headers
+    );
+
   if (req.status != 200) throw { code: "invalid_authentication" };
 
   const json: DiscordUser = await req.json();
+
+  if (env.DEBUG)
+    console.debug(
+      `API > Discord user fetched #2 : ${token.substring(0, 10)}`,
+      json
+    );
+
   return json;
 }

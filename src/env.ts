@@ -1,6 +1,9 @@
-import { envsafe, port, str } from "envsafe";
+import { bool, envsafe, port, str } from "envsafe";
 
 export const env = envsafe({
+  DEBUG: bool({
+    default: false,
+  }),
   PORT: port({
     default: 8000,
   }),
