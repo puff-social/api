@@ -35,6 +35,23 @@ export async function getUsersRoute(
     },
   });
 
+  // Remove the devices that are older then 28 days from the users array
+  // This is not done from the above query as that is just part of the
+  // filtering the users table, all devices are still returned regardless.
+  if (!req.query.all)
+    users = users.map((user) => {
+      user.devices = user.devices.filter(
+        (device) =>
+          device.last_active.getTime() >=
+          new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth(),
+            currentDate.getDate() - 28
+          ).getTime()
+      );
+      return user;
+    });
+
   // Sort the users by their total dabs across all devices
   users.sort((user, user2) => {
     const totalDabs1 = user.devices
