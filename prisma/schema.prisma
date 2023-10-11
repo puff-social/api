@@ -88,6 +88,7 @@ model devices {
   user_id            String?
   profiles           Json?
   last_dab           DateTime?           @db.Timestamp(6)
+  firmware_raw       Int                 @default(0)
   device_leaderboard device_leaderboard?
   device_logs        device_logs[]
   users              users?              @relation(fields: [user_id], references: [id])

@@ -8,7 +8,7 @@ import {
 
 const BaseHeaders = {
   "user-agent": "puff.social/1.0.0",
-  "x-app-version": "2.3.0",
+  "x-app-version": "2.4.0",
 };
 
 async function pullCurrentAppVersion() {
