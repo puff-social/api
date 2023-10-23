@@ -15,13 +15,22 @@ export async function remoteActionTrigger(
   if (req.headers["user-agent"]?.startsWith("BackgroundShortcutRunner"))
     switch (req.body.action) {
       case RemoteAction.BEGIN_HEAT: {
-        return res.status(200).send("Heat started on connected device");
+        return res.status(200).send("Heat started");
       }
       case RemoteAction.CANCEL_HEAT: {
         return res.status(200).send("Canceled session");
       }
       case RemoteAction.INQUIRE_DAB: {
         return res.status(200).send("Who's tryna dab?");
+      }
+      case RemoteAction.READY: {
+        return res.status(200).send("We are ready");
+      }
+      case RemoteAction.UNREADY: {
+        return res.status(200).send("We are ready");
+      }
+      case RemoteAction.SKIP_START: {
+        return res.status(200).send("Who cares we're dabbing anyway");
       }
     }
 
