@@ -29,7 +29,7 @@ export interface NewDevice {
 export interface Owner {
   id: string;
   name: string;
-  display_name: string;
+  display_name: string | null;
 }
 
 export interface DeviceNewOwner {

@@ -11,6 +11,7 @@ import { userFeedback } from "./methods/feedback";
 import { trackDevice, trackDiags } from "./methods/analytics";
 import { getDeviceLeaderboard } from "./methods/leaderboard";
 import { verifyToken } from "./methods/internal/verify";
+import { remoteActionTrigger } from "./methods/remote";
 
 export function InternalRoutes(
   server: FastifyInstance,
@@ -56,6 +57,8 @@ export function AuthedRoutes(
 
   server.patch("/user", updateUser);
 
+  server.post("/remote", remoteActionTrigger);
+
   server.get("/puffco/profiles", async (req, res) => {
     // if (req.user.platform != "puffco")
     //   return res
@@ -98,6 +101,7 @@ export function Routes(
 
   server.post("/track", trackDevice);
   server.post("/diag", trackDiags);
+
   server.get("/device/:device_mac", getDeviceByMac);
   server.get("/fw/peak/:serial", getOtaFirmware);
 

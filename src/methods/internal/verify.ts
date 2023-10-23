@@ -1,4 +1,4 @@
-import { users } from "@puff-social/commons";
+import { connections, users } from "@puff-social/commons";
 import { keydb } from "@puff-social/commons/dist/connectivity/keydb";
 
 import { FastifyReply, FastifyRequest } from "fastify";
@@ -40,7 +40,13 @@ export async function verifyToken(req: FastifyRequest, res: FastifyReply) {
     }
   } catch (error) {}
 
-  delete (user as Partial<users>).connections;
+  delete (
+    user as Partial<
+      users & {
+        connections: connections[];
+      }
+    >
+  ).connections;
 
   return res.status(200).send({
     valid: true,
