@@ -15,7 +15,7 @@ export const env = envsafe({
     devDefault: "http://10.8.99.24:8000",
   }),
   GATEWAY_HOST: str({
-    default: "http://gateway:9002",
+    default: "http://gateway:9000",
     devDefault: "http://10.8.99.23:9002",
   }),
   DASH_API_HOST: str({
