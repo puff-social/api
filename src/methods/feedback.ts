@@ -27,6 +27,7 @@ export async function userFeedback(req: FastifyRequest, res: FastifyReply) {
         id,
         message: validate.message,
         ip,
+        ...(req.user ? { user_id: req.user.id } : {}),
       },
     });
 

@@ -8,9 +8,11 @@ datasource db {
 }
 
 model feedback {
-  id      String @id
+  id      String  @id
   message String
   ip      String
+  user_id String?
+  users   users?  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model users {
@@ -26,6 +28,7 @@ model users {
   connections           connections[]
   devices               devices[]
   discord_subscriptions discord_subscriptions[]
+  feedback              feedback[]
   sessions              sessions[]
 }
 
@@ -176,4 +179,18 @@ model device_logs {
   devices        devices  @relation(fields: [device_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([device_id, type, timestamp, real_timestamp], map: "device_unq_time_type")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model discord_users_backup {
+  id            String?
+  xp            Int?
+  messages      Int?
+  vc_time       Int?
+  level         Int?
+  vc_time_alone Int?
+  invites       Int?
+  birthday      String?
+
+  @@ignore
 }
