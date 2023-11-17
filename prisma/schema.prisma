@@ -84,7 +84,7 @@ model devices {
   firmware           String
   hardware           Int
   git_hash           String
-  serial_number      String?
+  serial_number      String?             @unique(map: "devices_idx_serial")
   dob                DateTime            @db.Timestamp(6)
   last_active        DateTime            @default(now()) @db.Timestamp(6)
   last_ip            String?
@@ -193,4 +193,12 @@ model discord_users_backup {
   birthday      String?
 
   @@ignore
+}
+
+model debug_sessions {
+  id         String  @id
+  identifier String
+  data       Json    @default("{}")
+  ip_address String?
+  user_agent String?
 }

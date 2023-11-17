@@ -12,6 +12,7 @@ import { trackDevice, trackDiags } from "./methods/analytics";
 import { getDeviceLeaderboard } from "./methods/leaderboard";
 import { verifyToken } from "./methods/internal/verify";
 import { remoteActionTrigger } from "./methods/remote";
+import { generateDebuggingSession, submitDebuggingSession } from "./methods/debugging";
 
 export function InternalRoutes(
   server: FastifyInstance,
@@ -94,6 +95,9 @@ export function Routes(
   next: () => void
 ) {
   server.register(AuthMiddleware);
+
+  server.post("/debugging/generate", generateDebuggingSession);
+  server.post("/debugging/:id", submitDebuggingSession);
 
   server.get("/leaderboard", getDeviceLeaderboard);
 
