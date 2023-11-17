@@ -3,6 +3,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import {pika} from '@puff-social/commons/dist/pika';
 import { keydb } from "@puff-social/commons/dist/connectivity/keydb";
 import { prisma } from "../connectivity/prisma";
+import { debuggingSubmissionValidation } from "../utils";
 
 export async function generateDebuggingSession(
   req: FastifyRequest<{ Body: { deviceIdentifier: string } }>,
@@ -33,8 +34,10 @@ export async function submitDebuggingSession(
 ) {
   try {
     const deviceIden = await keydb.get(`debugging/${req.params.id}`);
+
+    const validated = await debuggingSubmissionValidation.parseAsync(req.body);
     
-    if (deviceIden != '')
+    if (deviceIden != validated.mac.replace(/:/g, ""))
       return res.status(400).send({ success: false, code: 'debug_session_id_mismatch' });
 
     await prisma.debug_sessions.create({data: {

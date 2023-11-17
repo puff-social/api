@@ -92,6 +92,10 @@ export const diagValidation = z.object({
   }),
 });
 
+export const debuggingSubmissionValidation = z.object({
+  mac
+});
+
 export function verifyRequest<T>(body: Buffer, signature: string): T {
   const key = Buffer.from(env.METRICS_KEY);
 
