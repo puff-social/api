@@ -27,6 +27,7 @@ export async function getOtaFirmware(
         gitHash,
         type,
         date: new Date(ota.fileMedia.created),
+        release: ota.fileMedia.originalUrl,
       };
     })(),
   };
