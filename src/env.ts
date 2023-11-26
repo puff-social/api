@@ -19,7 +19,7 @@ export const env = envsafe({
     devDefault: "http://10.8.99.23:9002",
   }),
   DASH_API_HOST: str({
-    default: "http://dash-api:8006",
+    default: "http://int-api:8006",
     devDefault: "http://10.8.99.4:8006",
   }),
   METRICS_KEY: str({

@@ -73,5 +73,10 @@ export async function trackLog(
       headers: { "content-type": "application/json" },
       body: JSON.stringify(data),
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error(
+      `Logging > Failed to send log event to internal api host`,
+      error
+    );
+  }
 }
