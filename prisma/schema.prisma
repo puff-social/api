@@ -162,9 +162,10 @@ model discord_users {
 }
 
 model firmware_watches {
-  id     String @id
-  serial String @unique(map: "firmware_serial_unq")
-  user   String
+  id       String  @id
+  serial   String  @unique(map: "firmware_serial_unq")
+  user     String?
+  nickname String?
 }
 
 model device_logs {
@@ -201,4 +202,5 @@ model debug_sessions {
   data       Json    @default("{}")
   ip_address String?
   user_agent String?
+  type       String  @default("infoAndLogs")
 }
