@@ -106,9 +106,9 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
     const validate = await trackingValidation.parseAsync(body);
 
     if (
-      'deviceModel' in validate &&
+      'model' in validate.device &&
       validate.device.model == DeviceModels.Onyx &&
-      'serialNumber' in validate &&
+      'serial' in validate.device &&
       validate.device.serial?.startsWith(SerialPrefixMap.Desert)
     ) {
       validate.device.model = DeviceModels.Desert;
