@@ -10,6 +10,7 @@ import {
   sanitize,
 } from "../utils";
 import { LogTypes, Owner, trackLog } from "../utils/logging";
+import { DeviceModels, SerialPrefixMap } from "@puff-social/commons/dist/puffco";
 
 export async function trackDiags(req: FastifyRequest, res: FastifyReply) {
   if (!req.headers["x-signature"])
@@ -46,6 +47,15 @@ export async function trackDiags(req: FastifyRequest, res: FastifyReply) {
         id: device.id,
         name: device.name,
       });
+    }
+
+    if (
+      'deviceModel' in validate &&
+      validate.deviceModel == DeviceModels.Onyx &&
+      'serialNumber' in validate &&
+      validate.device_parameters.serialNumber?.startsWith(SerialPrefixMap.Desert)
+    ) {
+      validate.device_parameters.model = DeviceModels.Desert;
     }
 
     await prisma.diagnostics.create({
@@ -94,6 +104,15 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
   );
   try {
     const validate = await trackingValidation.parseAsync(body);
+
+    if (
+      'deviceModel' in validate &&
+      validate.device.model == DeviceModels.Onyx &&
+      'serialNumber' in validate &&
+      validate.device.serial?.startsWith(SerialPrefixMap.Desert)
+    ) {
+      validate.device.model = DeviceModels.Desert;
+    }
 
     const ip = (req.headers["cf-connecting-ip"] ??
       req.socket.remoteAddress ??
