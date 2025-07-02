@@ -9,10 +9,10 @@ COPY .npmrc.ci package*.json pnpm-lock.yaml prisma ./
 RUN yarn global add pnpm
 RUN pnpm install
 
-# RUN pnpm prisma generate
+RUN pnpm prisma generate
 
 COPY . .
-RUN yarn build
+RUN pnpm build
 
 FROM node:18
 
