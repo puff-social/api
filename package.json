@@ -11,6 +11,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "argon2",
+      "prisma"
+    ]
+  },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^18.15.3",
