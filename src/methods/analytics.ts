@@ -10,14 +10,17 @@ import {
   sanitize,
 } from "../utils";
 import { LogTypes, Owner, trackLog } from "../utils/logging";
-import { DeviceModels, SerialPrefixMap } from "@puff-social/commons/dist/puffco";
+import {
+  DeviceModels,
+  SerialPrefixMap,
+} from "@puff-social/commons/dist/puffco";
 
 export async function trackDiags(req: FastifyRequest, res: FastifyReply) {
   if (!req.headers["x-signature"])
     return res.status(400).send({ code: "invalid_diag_data" });
   const body = verifyRequest(
     Buffer.from(req.rawBody as string, "base64"),
-    req.headers["x-signature"] as string
+    req.headers["x-signature"] as string,
   );
   const validate = await diagValidation.parseAsync(body);
 
@@ -50,10 +53,12 @@ export async function trackDiags(req: FastifyRequest, res: FastifyReply) {
     }
 
     if (
-      'deviceModel' in validate &&
+      "deviceModel" in validate &&
       validate.deviceModel == DeviceModels.Onyx &&
-      'serialNumber' in validate &&
-      validate.device_parameters.serialNumber?.startsWith(SerialPrefixMap.Desert)
+      "serialNumber" in validate &&
+      validate.device_parameters.serialNumber?.startsWith(
+        SerialPrefixMap.Desert,
+      )
     ) {
       validate.device_parameters.model = DeviceModels.Desert;
     }
@@ -82,6 +87,7 @@ export async function trackDiags(req: FastifyRequest, res: FastifyReply) {
         device_chamber_type: validate.device_parameters.chamberType,
         device_profiles: validate.device_profiles,
         device_services: validate.device_services,
+        device_series: validate.device_parameters.series,
         session_id: validate.session_id,
         user_agent: userAgent ?? "unknown",
         ip,
@@ -100,15 +106,15 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
     return res.status(400).send({ code: "invalid_tracking_data" });
   const body = verifyRequest(
     Buffer.from(req.rawBody as string, "base64"),
-    req.headers["x-signature"] as string
+    req.headers["x-signature"] as string,
   );
   try {
     const validate = await trackingValidation.parseAsync(body);
 
     if (
-      'model' in validate.device &&
+      "model" in validate.device &&
       validate.device.model == DeviceModels.Onyx &&
-      'serial' in validate.device &&
+      "serial" in validate.device &&
       validate.device.serial?.startsWith(SerialPrefixMap.Desert)
     ) {
       validate.device.model = DeviceModels.Desert;
@@ -153,6 +159,7 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
           dabs: validate.device.totalDabs,
           avg_dabs: validate.device.dabsPerDay,
           model: validate.device.model,
+          series: validate.device.series,
           firmware: validate.device.firmware,
           hardware: validate.device.hardware,
           git_hash: validate.device.gitHash,
@@ -178,6 +185,7 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
         firmware: validate.device.firmware,
         serial_number: validate.device.serial,
         device_model: validate.device.model,
+        series: validate.device.series,
         dabs: validate.device.totalDabs,
       });
       await prisma.devices.create({
@@ -188,6 +196,7 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
           dabs: validate.device.totalDabs,
           avg_dabs: validate.device.dabsPerDay,
           model: validate.device.model,
+          series: validate.device.series,
           firmware: validate.device.firmware,
           hardware: validate.device.hardware,
           git_hash: validate.device.gitHash,
@@ -217,6 +226,7 @@ export async function trackDevice(req: FastifyRequest, res: FastifyReply) {
         device: sanitize(device, [
           "mac",
           "model",
+          "series",
           "hardware",
           "serial_number",
           "dob",

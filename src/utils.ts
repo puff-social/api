@@ -45,6 +45,7 @@ export const trackingValidation = z.object({
     totalDabs: z.number(),
     dabsPerDay: z.number(),
     model: z.enum(ProductModels),
+    series: z.number().max(1).min(0).optional(),
     firmware: z.string(),
     hardware: z.number(),
     gitHash: z.string().max(7),
@@ -63,7 +64,7 @@ const profileValidation = z.object({
 export const diagValidation = z.object({
   session_id: z.string(),
   device_services: z.array(
-    z.object({ uuid: z.string(), characteristicCount: z.number() })
+    z.object({ uuid: z.string(), characteristicCount: z.number() }),
   ),
   device_profiles: z
     .object({
@@ -76,6 +77,7 @@ export const diagValidation = z.object({
   device_parameters: z.object({
     name: z.string(),
     model: z.enum(ProductModels),
+    series: z.number().max(1).min(0).optional(),
     firmware: z.string(),
     hash: z.string().max(7).optional(),
     uptime: z.number().optional(),
@@ -93,7 +95,7 @@ export const diagValidation = z.object({
 });
 
 export const debuggingSubmissionValidation = z.object({
-  mac
+  mac,
 });
 
 export function verifyRequest<T>(body: Buffer, signature: string): T {

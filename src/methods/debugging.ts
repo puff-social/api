@@ -52,7 +52,7 @@ export async function submitDebuggingSession(
         id: req.params.id,
         identifier: deviceIden,
         type: req.query.type ?? "infoAndLogs",
-        data: req.body,
+        data: validated,
         ip_address: (req.headers["cf-connecting-ip"] ??
           req.socket.remoteAddress ??
           "0.0.0.0") as string,
@@ -66,7 +66,7 @@ export async function submitDebuggingSession(
       ip: (req.headers["cf-connecting-ip"] ??
         req.socket.remoteAddress ??
         "0.0.0.0") as string,
-      data: req.body,
+      data: validated,
     });
 
     // Send a hook that we received some debugging data from a session.

@@ -55,6 +55,7 @@ model diagnostics {
   device_serial_number    String?
   device_hardware_version String?
   device_mac              String?
+  device_series           Int?
 }
 
 model strains {
@@ -81,6 +82,7 @@ model devices {
   dabs               Int
   avg_dabs           Float               @default(0.0) @db.Real
   model              String              @default("0")
+  series             Int                 @default(0)
   firmware           String
   hardware           Int
   git_hash           String

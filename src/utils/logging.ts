@@ -1,3 +1,4 @@
+import { ProductSeries } from "@puff-social/commons/dist/puffco";
 import { env } from "../env";
 
 export enum LogTypes {
@@ -21,6 +22,7 @@ export interface NewDevice {
   id: string;
   name: string;
   device_model: string;
+  series: ProductSeries;
   dabs: number;
   firmware: string;
   serial_number?: string;
