@@ -4,10 +4,11 @@ import { pika } from "@puff-social/commons/dist/pika";
 import { keydb } from "@puff-social/commons/dist/connectivity/keydb";
 import { prisma } from "../connectivity/prisma";
 import { debuggingSubmissionValidation } from "../utils";
+import { LogTypes, trackLog } from "../utils/logging";
 
 export async function generateDebuggingSession(
   req: FastifyRequest<{ Body: { deviceIdentifier: string } }>,
-  res: FastifyReply
+  res: FastifyReply,
 ) {
   try {
     const id = pika.gen("debugging");
@@ -34,7 +35,7 @@ export async function submitDebuggingSession(
     Querystring: { type?: string };
     Body: Record<string, any>;
   }>,
-  res: FastifyReply
+  res: FastifyReply,
 ) {
   try {
     const deviceIden = await keydb.get(`debugging/${req.params.id}`);
@@ -57,6 +58,15 @@ export async function submitDebuggingSession(
           "0.0.0.0") as string,
         user_agent: req.headers["user-agent"] ?? "Unknown",
       },
+    });
+
+    trackLog(LogTypes.NewDebuggingSession, "debugging", {
+      id: req.params.id,
+      identifier: deviceIden,
+      ip: (req.headers["cf-connecting-ip"] ??
+        req.socket.remoteAddress ??
+        "0.0.0.0") as string,
+      data: req.body,
     });
 
     // Send a hook that we received some debugging data from a session.

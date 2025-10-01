@@ -7,6 +7,7 @@ export enum LogTypes {
   SiteFeedback,
   DeviceDabsUpdate,
   DeviceConnection,
+  NewDebuggingSession,
 }
 
 export interface NewUser {
@@ -56,6 +57,13 @@ export interface DeviceDabsUpdate {
   dabs: number;
 }
 
+export interface DebuggingSession {
+  id: string;
+  identifier: string;
+  data: Record<string, any>;
+  ip: string;
+}
+
 export async function trackLog(
   type: LogTypes,
   channel: string,
@@ -66,6 +74,7 @@ export async function trackLog(
     | SiteFeedback
     | DeviceConnection
     | DeviceDabsUpdate
+    | DebuggingSession,
 ) {
   try {
     await fetch(`${env.DASH_API_HOST}/log?type=${type}&channel=${channel}`, {
@@ -76,7 +85,7 @@ export async function trackLog(
   } catch (error) {
     console.error(
       `Logging > Failed to send log event to internal api host`,
-      error
+      error,
     );
   }
 }
