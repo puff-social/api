@@ -95,7 +95,18 @@ export const diagValidation = z.object({
 });
 
 export const debuggingSubmissionValidation = z.object({
+  name: z.string(),
+  serial: z.string(),
   mac,
+  model: z.enum(ProductModels),
+  hardwareVersion: z.number(),
+  firmware: z.string(),
+  gitHash: z.string().max(7),
+  chamberType: z.number(),
+  dob: z.number(),
+  utc: z.number(),
+  apiVersion: z.number(),
+  apiSeries: z.number().max(1).min(0),
 });
 
 export function verifyRequest<T>(body: Buffer, signature: string): T {
